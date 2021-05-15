@@ -48,7 +48,54 @@ class Werbinich(object):
     def on_load(self, request):
         """ Handle all form submit events """
         error=None
+        sid = request.cookies.get("session_id")
+        if sid is None:
+            request.session = session_store.new()
+            sid = request.session.sid
+        else:
+            request.session = session_store.get(sid)
+        if request.method == 'POST':
+            op = request.form["operation"]
+            return getattr(self, op)(request, sid)  # call operation method
         return self.render_template('login.html', error=error)
+
+    def login(self, request, sid):
+        username = request.form["username"]
+        pw = request.form["pw"]
+        pw_hash = self.get_user_pw(username)
+        if pw_hash and sha256.verify(pw, pw_hash):
+            games_list = self.get_list_of_games()
+            response = self.render_template('join_game.html', error=None, game_list=games_list)
+            response.set_cookie("username", username)
+            if request.session.should_save:
+                session_store.save(request.session)
+            response.set_cookie("session_id", request.session.sid)
+            self.redis.hset(username, "session_id", sid)
+            return response
+        elif pw_hash:
+            error = "Falsches Passwort."
+        else:
+            error = "Nutzer nicht gefunden."
+        return self.render_template("login.html", error=error)
+
+    def get_list_of_games(self):
+        """ get a `set` of game IDs """
+        keys = self.redis.scan(0)[1]
+        games_list = []
+        if keys:
+            for key in keys:
+                game_id = self.redis.hget(key, "game_id") or "None"
+                if not game_id in games_list and game_id != "None":
+                    games_list.append(game_id)
+        return games_list
+
+    def get_user_pw(self, username):
+        keys = self.redis.scan(0)[1]
+        if username in keys:
+            res = self.redis.hget(username, "pw_hash")
+        else:
+            res = None
+        return res
 
 def create_app(with_static=True):
     app = Werbinich()
