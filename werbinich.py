@@ -50,7 +50,7 @@ class Werbinich(object):
         error=None
         return self.render_template('login.html', error=error)
 
-def create_app(redis_host='localhost', redis_port=6379, with_static=True):
+def create_app(with_static=True):
     app = Werbinich()
     if with_static:
         app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
