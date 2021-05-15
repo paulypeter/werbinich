@@ -60,6 +60,7 @@ class Werbinich(object):
         return self.render_template('login.html', error=error)
 
     def login(self, request, sid):
+        """ Handle user login """
         username = request.form["username"]
         pw = request.form["pw"]
         pw_hash = self.get_user_pw(username)
@@ -78,6 +79,26 @@ class Werbinich(object):
             error = "Nutzer nicht gefunden."
         return self.render_template("login.html", error=error)
 
+    def registration_form(self, request, sid):
+        return self.render_template('registration_form.html', error=None)
+
+    def register(self, request, sid):
+        """ handle user registration """
+        username = request.form["username"]
+        name = request.form["name"]
+        pw = request.form["pw"]
+        pw_confirm = request.form["pw_confirm"]
+        if pw == pw_confirm:
+            self.set_user_name_and_pw(username, name, pw)
+        games_list = self.get_list_of_games()
+        response = self.render_template('join_game.html', error=None, game_list=games_list)
+        response.set_cookie("username", username)
+        if request.session.should_save:
+            session_store.save(request.session)
+        response.set_cookie("session_id", request.session.sid)
+        self.redis.hset(username, "session_id", sid)
+        return response
+
     def get_list_of_games(self):
         """ get a `set` of game IDs """
         keys = self.redis.scan(0)[1]
@@ -89,7 +110,14 @@ class Werbinich(object):
                     games_list.append(game_id)
         return games_list
 
+    def set_user_name_and_pw(self, username, name, password):
+        """ insert name, pw into db """
+        pw_hash = sha256.hash(password)
+        self.redis.hset(username, "pw_hash", pw_hash)
+        self.redis.hset(username, "name", name)
+
     def get_user_pw(self, username):
+        """ get hash of user pw """
         keys = self.redis.scan(0)[1]
         if username in keys:
             res = self.redis.hget(username, "pw_hash")

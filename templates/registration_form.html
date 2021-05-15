@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}Spiel starten{% endblock %}
+{% block body %}
+  <h2>Nutzername und Passwort:</h2>
+  <form action="" method=post>
+    {% if error %}
+      <p class=error><strong>Fehler:</strong> {{ error }}
+    {% endif %}
+    <p>Spiel:
+    <p><input type=text name=username placeholder="Nutzername" value="{{ url }}" required>
+    <p><input type=text name=name placeholder="Name">
+    <p><input type="password" placeholder="Passwort" name=pw required>
+    <p><input type="password" name=pw_confirm placeholder="Passwort bestätigen" required>
+    <input type="hidden" name=operation value=register>
+    <p><input type=submit value="Registrieren">
+  </form>
+{% endblock %}
