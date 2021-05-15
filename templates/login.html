@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block title %}Anmelden{% endblock %}
+{% block body %}
+  <h2>Nutzername und Passwort:</h2>
+  <form action="" method=post>
+    {% if error %}
+      <p class=error><strong>Fehler:</strong> {{ error }}
+    {% endif %}
+    <p>Anmelden:
+      <p><input type=text name=username value="{{ url }}" required>
+      <p><input type="password" name=pw required>
+      <p><input type="hidden" name=operation value=login>
+      <p><input type=submit value="Anmelden">
+  </form>
+  <form action="" method=post>
+  <p>Noch nicht registriert?</p>
+  <input type="hidden" name=operation value=registration_form>
+  <p><input type=submit value="Hier klicken"></p>
+  </form>
+{% endblock %}
