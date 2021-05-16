@@ -56,7 +56,10 @@ class Werbinich(object):
             request.session = session_store.get(sid)
         if request.method == 'POST':
             op = request.form["operation"]
-            return getattr(self, op)(request, sid)  # call operation method
+            if self.check_cookie_data(request) or op == "login":
+                return getattr(self, op)(request, sid)  # call operation method
+            else:
+                error = "Falsche Cookiedaten."
         return self.render_template('login.html', error=error)
 
     def login(self, request, sid):
@@ -118,8 +121,6 @@ class Werbinich(object):
         game_id = request.form["game_id"]
         game_pw = request.form["game_pw"]
         cookie_user_name = request.cookies.get("username")
-        if not self.check_cookie_data(cookie_user_name, sid):
-            return redirect("/")
         games_list = self.get_list_of_games()
         if game_id in games_list:# if game exists
             pw_hash = self.get_game_pw(game_id)
@@ -195,11 +196,15 @@ class Werbinich(object):
             res = None
         return res
 
-    def check_cookie_data(self, username, sid):
+    def check_cookie_data(self, request):
         keys = self.redis.scan(0)[1]
-        if username in keys:
-            saved_session_id = self.redis.hget(username, "session_id")
-            return saved_session_id == sid
+        cookie_user_name = request.cookies.get("username")
+        if cookie_user_name in keys:
+            cookie_sid = request.cookies.get("session_id")
+            cookie_game_id = request.cookies.get("game_id")
+            saved_session_id = self.redis.hget(cookie_user_name, "session_id")
+            saved_game_id = self.redis.hget(cookie_user_name, "game_id")
+            return saved_session_id == cookie_sid and saved_game_id == cookie_game_id
         else:
             return False
 
