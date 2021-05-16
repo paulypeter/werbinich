@@ -56,7 +56,7 @@ class Werbinich(object):
             request.session = session_store.get(sid)
         if request.method == 'POST':
             op = request.form["operation"]
-            if self.check_cookie_data(request) or op == "login":
+            if self.check_cookie_data(request) or op in ["login", "registration_form", "register"]:
                 return getattr(self, op)(request, sid)  # call operation method
             else:
                 error = "Falsche Cookiedaten."
@@ -74,7 +74,17 @@ class Werbinich(object):
         pw_hash = self.get_user_pw(username)
         if pw_hash and sha256.verify(pw, pw_hash):
             games_list = self.get_list_of_games()
-            response = self.render_template('join_game.html', error=None, game_list=games_list)
+            success = "Angemeldet."
+            saved_game_id = self.redis.hget(username, "game_id")
+            if saved_game_id != "None":
+                success = "Spiel beigetreten."
+                player_list = self.get_other_players(username)
+                response = self.render_template('game.html', error=None, success=success, player_list=player_list)
+                response.set_cookie("game_id", saved_game_id)
+                response.set_cookie("session_id", request.session.sid)
+                self.redis.hset(username, "session_id", sid)
+                return response
+            response = self.render_template('join_game.html', error=None, success=success, game_list=games_list)
             response.set_cookie("username", username)
             if request.session.should_save:
                 session_store.save(request.session)
@@ -104,7 +114,8 @@ class Werbinich(object):
         if pw == pw_confirm:
             self.set_user_name_and_pw(username, name, pw)
         games_list = self.get_list_of_games()
-        response = self.render_template('join_game.html', error=None, game_list=games_list)
+        success = "Registriert und angemeldet."
+        response = self.render_template('join_game.html', error=None, success=success, game_list=games_list)
         response.set_cookie("username", username)
         if request.session.should_save:
             session_store.save(request.session)
@@ -118,16 +129,17 @@ class Werbinich(object):
         if not all(item in args for item in required):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
+        cookie_user_name = request.cookies.get("username")
         game_id = request.form["game_id"]
         game_pw = request.form["game_pw"]
-        cookie_user_name = request.cookies.get("username")
         games_list = self.get_list_of_games()
         if game_id in games_list:# if game exists
             pw_hash = self.get_game_pw(game_id)
             if sha256.verify(game_pw, pw_hash):#... and pw is correct
                 self.redis.hset(cookie_user_name, "game_id", game_id)
                 player_list = self.get_other_players(cookie_user_name)
-                response = self.render_template('game.html', error=None, player_list=player_list)
+                success = "Spiel beigetreten."
+                response = self.render_template('game.html', error=None, success=success, player_list=player_list)
                 response.set_cookie("game_id", game_id)
             else:# game exists, pw incorrect
                 response = self.render_template('join_game.html', error="Falsches Passwort", game_list=games_list)
@@ -159,7 +171,7 @@ class Werbinich(object):
     def reload_game(self, request, sid):
         cookie_user_name = request.cookies.get("username")
         player_list = self.get_other_players(cookie_user_name)
-        response = self.render_template('game.html', error=None, player_list=player_list)
+        response = self.render_template('game.html', error=None, success=None, player_list=player_list)
         return response
 
     def leave_game(self, request, sid):

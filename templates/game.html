@@ -3,7 +3,12 @@
 {% block body %}
   <h2>Spieler:</h2>
     {% if error %}
-      <p class=error><strong>Fehler:</strong> {{ error }}
+      <div class=error><strong>Fehler:</strong> {{ error }}
+      </div>
+    {% endif %}
+    {% if success %}
+      <div class=success><strong>Erfolg:</strong> {{ success }}
+      </div>
     {% endif %}
   <form action="" method="POST">
     <p><select name=player id=player>
@@ -27,12 +32,12 @@
   </div>
   {% endfor %}
   {% endif %}
-  <form action="" method=post>
-    <p><input type=submit class=button value="   Spiel verlassen   "></p>
-    <input type=hidden name=operation value=leave_game>
-  </form>
   <form action="" method="POST">
     <input type="hidden" name=operation value=reload_game>
     <p><input type="submit" value="   Neu laden   "></p>
+  </form>
+  <form action="" method=post>
+    <p><input type=submit class=button value="   Spiel verlassen   "></p>
+    <input type=hidden name=operation value=leave_game>
   </form>
 {% endblock %}

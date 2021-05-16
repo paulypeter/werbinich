@@ -72,3 +72,30 @@ select {
     padding: 0px;
     margin: 0px;
 }
+
+.error {
+    border-radius: 5px;
+    border: solid red;
+    width: 400px;
+    margin: 0 auto;
+    padding-top: 5px;
+    background: rgba(255, 0, 0, 0.4);;
+    opacity: 0;
+    animation: fade 1.5s linear;
+}
+
+.success {
+    border-radius: 5px;
+    border: solid green;
+    width: 400px;
+    margin: 0 auto;
+    padding-top: 5px;
+    background: rgba(0, 255, 0, 0.4);;
+    opacity: 0;
+    animation: fade 1.5s linear;
+}
+
+@keyframes fade {
+    0% { opacity: 1 }
+    100% { opacity: 0 }
+}
