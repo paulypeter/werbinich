@@ -61,8 +61,13 @@ class Werbinich(object):
 
     def login(self, request, sid):
         """ Handle user login """
+        args = list(request.form.keys())
+        required = ["username", "login_pw"]
+        if not all(item in args for item in required):
+            error = "Das funktioniert nicht."
+            return self.render_template('login.html', error=error)
         username = request.form["username"]
-        pw = request.form["pw"]
+        pw = request.form["login_pw"]
         pw_hash = self.get_user_pw(username)
         if pw_hash and sha256.verify(pw, pw_hash):
             games_list = self.get_list_of_games()
@@ -84,6 +89,11 @@ class Werbinich(object):
 
     def register(self, request, sid):
         """ handle user registration """
+        args = list(request.form.keys())
+        required = ["username", "pw", "name", "pw_confirm"]
+        if not all(item in args for item in required):
+            error = "Das funktioniert nicht."
+            return self.render_template('login.html', error=error)
         username = request.form["username"]
         name = request.form["name"]
         pw = request.form["pw"]
@@ -100,6 +110,11 @@ class Werbinich(object):
         return response
 
     def join_game(self, request, sid):
+        args = list(request.form.keys())
+        required = ["game_id", "game_pw"]
+        if not all(item in args for item in required):
+            error = "Das funktioniert nicht."
+            return self.render_template('login.html', error=error)
         game_id = request.form["game_id"]
         game_pw = request.form["game_pw"]
         cookie_user_name = request.cookies.get("username")
@@ -127,6 +142,11 @@ class Werbinich(object):
         return response
 
     def set_player_character(self, request, sid):
+        args = list(request.form.keys())
+        required = ["player", "character"]
+        if not all(item in args for item in required):
+            error = "Das funktioniert nicht."
+            return self.render_template('login.html', error=error)
         cookie_user_name = request.cookies.get("username")
         player_id = request.form["player"]
         player_character = request.form["character"]
