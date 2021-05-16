@@ -108,6 +108,10 @@ class Werbinich(object):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
         username = request.form["username"]
+        keys = self.redis.scan(0)[1]
+        if username in keys:
+            error = "Diese:r Nutzer:in existiert bereits."
+            return self.render_template('registration_form.html', error=error)
         name = request.form["name"]
         pw = request.form["pw"]
         pw_confirm = request.form["pw_confirm"]
