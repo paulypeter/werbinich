@@ -1,0 +1,74 @@
+*
+{
+    margin:10px;
+    padding:0px;
+    font-family: Helvetica, sans-serif;
+    font-size: 12pt;
+}
+
+.box {
+    width: auto;
+    text-align: center;
+} 
+.column {
+    display: inline-block;
+}
+
+.topnav {
+    text-align: center;
+    background: darkblue;
+    top: 0px;
+    left: 0px;
+    margin: 0px;
+    padding: 10px;
+    color: white;
+}
+
+.header {
+    font-weight: bold;
+}
+
+input, select{
+    border-radius: 5px;
+    padding: 2px;
+    padding-top: 5px;
+    margin: 2px;
+}
+
+select {
+    width: 170px;
+    cursor: pointer;
+}
+
+.button {
+    cursor: pointer;
+}
+
+.textlink {
+    text-decoration: underline;
+    border: none;
+    cursor: pointer;
+}
+
+.column {
+    width: 100px;
+    vertical-align: middle;
+}
+
+.container {
+    width: 400px;
+    margin: 0 auto;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.sideform {
+    padding: 0px;
+    margin: 0px;
+}

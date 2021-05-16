@@ -7,14 +7,14 @@
       <p class=error><strong>Fehler:</strong> {{ error }}
     {% endif %}
     <p>Anmelden:
-      <p><input type=text name=username value="{{ url }}" required>
-      <p><input type="password" name=login_pw required>
+      <p><input type=text name=username placeholder="Nutzername" required>
+      <p><input type="password" name=login_pw placeholder="Passwort" required>
       <p><input type="hidden" name=operation value=login>
-      <p><input type=submit value="Anmelden">
+      <p><input type=submit class=button value="   Anmelden   ">
   </form>
   <form action="" method=post>
   <p>Noch nicht registriert?</p>
   <input type="hidden" name=operation value=registration_form>
-  <p><input type=submit value="Hier klicken"></p>
+  <p><input type=submit class=textlink value="Hier klicken"></p>
   </form>
 {% endblock %}
