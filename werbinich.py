@@ -161,6 +161,14 @@ class Werbinich(object):
         response = self.render_template('game.html', error=None, player_list=player_list)
         return response
 
+    def leave_game(self, request, sid):
+        cookie_user_name = request.cookies.get("username")
+        games_list = self.get_list_of_games()
+        response = self.render_template('join_game.html', error=None, game_list=games_list)
+        response.set_cookie("game_id", "None")
+        self.redis.hset(cookie_user_name, "game_id", "None")
+        return response
+
     def get_list_of_games(self):
         """ get a `set` of game IDs """
         keys = self.redis.scan(0)[1]
