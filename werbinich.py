@@ -135,6 +135,12 @@ class Werbinich(object):
         response = self.render_template('game.html', error=None, player_list=player_list)
         return response
 
+    def reload_game(self, request, sid):
+        cookie_user_name = request.cookies.get("username")
+        player_list = self.get_other_players(cookie_user_name)
+        response = self.render_template('game.html', error=None, player_list=player_list)
+        return response
+
     def get_list_of_games(self):
         """ get a `set` of game IDs """
         keys = self.redis.scan(0)[1]
