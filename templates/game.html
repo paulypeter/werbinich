@@ -13,11 +13,7 @@
     </select></p>
     <p><input type="text" placeholder="Charakter" name=character></p>
     <input type="hidden" name=operation value=set_player_character>
-    <p><input type="submit" value=Eintragen></p>
-  </form>
-  <form action="" method="POST">
-    <input type="hidden" name=operation value=reload_game>
-    <p><input type="submit" value="Neu laden"></p>
+    <p><input type="submit" value="   Eintragen   "></p>
   </form>
   <div class="row">
     <div class="column header">Spieler</div>
@@ -32,7 +28,11 @@
   {% endfor %}
   {% endif %}
   <form action="" method=post>
-    <p><input type=submit value="Spiel verlassen"></p>
+    <p><input type=submit class=button value="   Spiel verlassen   "></p>
     <input type=hidden name=operation value=leave_game>
+  </form>
+  <form action="" method="POST">
+    <input type="hidden" name=operation value=reload_game>
+    <p><input type="submit" value="   Neu laden   "></p>
   </form>
 {% endblock %}
