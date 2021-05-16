@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}aktuelles Spiel{% endblock %}
+{% block body %}
+  <h2>Spieler:</h2>
+    {% if error %}
+      <p class=error><strong>Fehler:</strong> {{ error }}
+    {% endif %}
+  <form action="" method="POST">
+    <p><input type="text" placeholder="Spielername" name=player></p>
+    <p><input type="text" placeholder="Charakter" name=character></p>
+    <input type="hidden" name=operation value=set_player_character>
+    <p><input type="submit" value=Eintragen></p>
+  </form>
+  <div class="row">
+    <div class="column header">Spieler</div>
+    <div class="column header">Charakter</div>
+  </div>
+  {% if player_list %}
+  {% for key, value in player_list.items() %}
+  <div class=row>
+    <div class=column>{{ key }}</div>
+    <div class=column>{{ value }}</div>
+  </div>
+  {% endfor %}
+  {% endif %}
+  <form action="" method=post>
+    <p><input type=submit value="Spiel verlassen"></p>
+    <input type=hidden name=operation value=leave_game>
+  </form>
+{% endblock %}

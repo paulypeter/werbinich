@@ -99,6 +99,32 @@ class Werbinich(object):
         self.redis.hset(username, "session_id", sid)
         return response
 
+    def join_game(self, request, sid):
+        game_id = request.form["game_id"]
+        game_pw = request.form["game_pw"]
+        cookie_user_name = request.cookies.get("username")
+        if not self.check_cookie_data(cookie_user_name, sid):
+            return redirect("/")
+        games_list = self.get_list_of_games()
+        if game_id in games_list:# if game exists
+            pw_hash = self.get_game_pw(game_id)
+            if sha256.verify(game_pw, pw_hash):#... and pw is correct
+                self.redis.hset(cookie_user_name, "game_id", game_id)
+                player_list = self.get_other_players(cookie_user_name)
+                response = self.render_template('game.html', error=None, player_list=player_list)
+                response.set_cookie("game_id", game_id)
+            else:# game exists, pw incorrect
+                response = self.render_template('join_game.html', error="Falsches Passwort", game_list=games_list)
+        else:
+            # create game
+            self.redis.hset(cookie_user_name, "game_host", "true")
+            pw_hash = sha256.hash(game_pw)
+            self.redis.hset(cookie_user_name, "game_pw", pw_hash)
+            self.redis.hset(cookie_user_name, "game_id", game_id)
+            player_list = self.get_other_players(cookie_user_name)
+            response = self.render_template('game.html', error=None, player_list=player_list)
+            response.set_cookie("game_id", game_id)
+        return response
     def get_list_of_games(self):
         """ get a `set` of game IDs """
         keys = self.redis.scan(0)[1]
@@ -123,6 +149,33 @@ class Werbinich(object):
             res = self.redis.hget(username, "pw_hash")
         else:
             res = None
+        return res
+
+    def check_cookie_data(self, username, sid):
+        keys = self.redis.scan(0)[1]
+        if username in keys:
+            saved_session_id = self.redis.hget(username, "session_id")
+            return saved_session_id == sid
+        else:
+            return False
+
+    def get_other_players(self, user_id):
+        """ get other players in the same game """
+        keys = self.redis.scan(0)[1]
+        player_list = {}
+        user_game_id = self.redis.hget(user_id, "game_id")
+        for key in keys:
+            if self.redis.hget(key, "game_id") == str(user_game_id) and str(user_id) != key:
+                player_list[self.redis.hget(key, "name")] = self.redis.hget(key, "charakter")
+        return player_list
+
+    def get_game_pw(self, game_id):
+        """ get game pw from host """
+        keys = self.redis.scan(0)[1]
+        res = "None"
+        for key in keys:
+            if "game_host" in self.redis.hkeys(key) and self.redis.hget(key, "game_id") == game_id:
+                res = str(self.redis.hget(key, "game_pw"))
         return res
 
 def create_app(with_static=True):
