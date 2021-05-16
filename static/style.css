@@ -81,7 +81,7 @@ select {
     padding-top: 5px;
     background: rgba(255, 0, 0, 0.4);;
     opacity: 0;
-    animation: fade 1.5s linear;
+    animation: fade 3.5s linear;
 }
 
 .success {
