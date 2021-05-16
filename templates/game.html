@@ -6,7 +6,11 @@
       <p class=error><strong>Fehler:</strong> {{ error }}
     {% endif %}
   <form action="" method="POST">
-    <p><input type="text" placeholder="Spielername" name=player></p>
+    <p><select name=player id=player>
+        {% for key, value in player_list.items() %}
+        <option value={{ key }}>{{ value["name"] }}</option>
+        {% endfor %}
+    </select></p>
     <p><input type="text" placeholder="Charakter" name=character></p>
     <input type="hidden" name=operation value=set_player_character>
     <p><input type="submit" value=Eintragen></p>
@@ -18,8 +22,8 @@
   {% if player_list %}
   {% for key, value in player_list.items() %}
   <div class=row>
-    <div class=column>{{ key }}</div>
-    <div class=column>{{ value }}</div>
+    <div class=column>{{ value["name"] }}</div>
+    <div class=column>{{ value["character"] }}</div>
   </div>
   {% endfor %}
   {% endif %}

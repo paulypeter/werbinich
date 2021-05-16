@@ -125,6 +125,16 @@ class Werbinich(object):
             response = self.render_template('game.html', error=None, player_list=player_list)
             response.set_cookie("game_id", game_id)
         return response
+
+    def set_player_character(self, request, sid):
+        cookie_user_name = request.cookies.get("username")
+        player_id = request.form["player"]
+        player_character = request.form["character"]
+        self.redis.hset(player_id, "character", player_character)
+        player_list = self.get_other_players(cookie_user_name)
+        response = self.render_template('game.html', error=None, player_list=player_list)
+        return response
+
     def get_list_of_games(self):
         """ get a `set` of game IDs """
         keys = self.redis.scan(0)[1]
@@ -166,7 +176,10 @@ class Werbinich(object):
         user_game_id = self.redis.hget(user_id, "game_id")
         for key in keys:
             if self.redis.hget(key, "game_id") == str(user_game_id) and str(user_id) != key:
-                player_list[self.redis.hget(key, "name")] = self.redis.hget(key, "charakter")
+                player_list[key] = {
+                    "name": self.redis.hget(key, "name"),
+                    "character": self.redis.hget(key, "character")
+                }
         return player_list
 
     def get_game_pw(self, game_id):
