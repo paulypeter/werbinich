@@ -180,6 +180,16 @@ class Werbinich(object):
 
     def leave_game(self, request, sid):
         cookie_user_name = request.cookies.get("username")
+        if "game_host" in self.redis.hkeys(cookie_user_name):
+            game_id = request.cookies.get("game_id")
+            other_players = self.get_other_players(cookie_user_name)
+            game_pw = self.redis.hget(cookie_user_name, "game_pw")
+            self.redis.hdel(cookie_user_name, "game_pw")
+            self.redis.hdel(cookie_user_name, "game_host")
+            if other_players:
+                new_host = other_players[0]
+                self.redis.hset(new_host, "game_host", "true")
+                self.redis.hset(new_host, "game_pw", game_pw)
         games_list = self.get_list_of_games()
         response = self.render_template('join_game.html', error=None, game_list=games_list)
         response.set_cookie("game_id", "None")
