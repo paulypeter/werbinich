@@ -187,7 +187,7 @@ class Werbinich(object):
             self.redis.hdel(cookie_user_name, "game_pw")
             self.redis.hdel(cookie_user_name, "game_host")
             if other_players:
-                new_host = other_players[next(iter(other_players.keys()))]
+                new_host = next(iter(other_players.keys()))
                 self.redis.hset(new_host, "game_host", "true")
                 self.redis.hset(new_host, "game_pw", game_pw)
         games_list = self.get_list_of_games()
