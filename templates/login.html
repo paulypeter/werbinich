@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}Anmelden{% endblock %}
 {% block body %}
-  <h2>Nutzername und Passwort:</h2>
-  <form action="" method=post>
     {% if error %}
       <div class=error><strong>Fehler:</strong> {{ error }}
         </div>
@@ -11,12 +9,14 @@
       <div class=success><strong>Erfolg:</strong> {{ success }}
       </div>
     {% endif %}
-    <p>Anmelden:
+    <h2>Nutzername und Passwort:</h2>
+    <form action="" method=post>
       <p><input type=text name=username placeholder="Nutzername" required>
       <p><input type="password" name=login_pw placeholder="Passwort" required>
       <p><input type="hidden" name=operation value=login>
       <p><input type=submit class=button value="   Anmelden   ">
   </form>
+  <hr>
   <form action="" method=post>
   <p>Noch nicht registriert?</p>
   <input type="hidden" name=operation value=registration_form>

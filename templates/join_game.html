@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}Spiel starten{% endblock %}
 {% block body %}
-  <h2>Spiel und Passwort:</h2>
-  <form action="" method=post>
     {% if error %}
       <div class=error><strong>Fehler:</strong> {{ error }}
         </div>
@@ -11,15 +9,18 @@
       <div class="success"><strong>Erfolg:</strong> {{ success }}
       </div>
     {% endif %}
-    <p>Spiel beitreten:
-      <p><input type=text name=game_id value="{{ game_id }}" required>
-      <p><input type="password" name=game_pw required>
+    <h2>Spiel und Passwort:</h2>
+    <form action="" method=post>
+      <p><input type=text name=game_id id=game_id placeholder=Spiel-ID required>
+      <p><input type="text" name=game_pw placeholder=Spiel-Passwort required>
       <p><input type="hidden" name=operation value=join_game>
       <p><input type=submit class=button value="   Beitreten   ">
   </form>
+  <hr>
+  <h2>aktuelle Spiele:</h2>
   {% if game_list %}
   {% for item in game_list %}
-    <p>{{ item }}</p>
+    <p class=clickable onclick="document.getElementById('game_id').value = '{{ item }}'">{{ item }}</p>
   {% endfor %}
   {% endif %}
 {% endblock %}
