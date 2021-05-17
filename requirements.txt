@@ -1,0 +1,5 @@
+secure_cookie==0.1.0
+redis==3.5.3
+passlib==1.7.4
+Jinja2==3.0.0
+Werkzeug==2.0.0
