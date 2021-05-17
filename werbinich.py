@@ -238,7 +238,7 @@ class Werbinich(object):
             cookie_game_id = request.cookies.get("game_id")
             saved_session_id = self.redis.hget(cookie_user_name, "session_id")
             saved_game_id = self.redis.hget(cookie_user_name, "game_id")
-            return saved_session_id == cookie_sid and saved_game_id == cookie_game_id
+            return saved_session_id == cookie_sid and saved_game_id == str(cookie_game_id)
         else:
             return False
 
