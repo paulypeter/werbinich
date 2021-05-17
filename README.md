@@ -13,6 +13,9 @@ Die Seite soll dabei helfen, ohne Klebezettel "Wer bin ich?" zu spielen.
 Die Seite funktioniert zusammen mit dem WerBinIchHelferBot. Spieler:innen ohne Telegram können so mitspielen!
 
 Es ist eine Registrierung notwendig.
+Dabei werden ein Nutzername und ein von anderen Spieler:innen einsehbarer Name angegeben.
+Außerdem muss ein Passwort vergeben werden.
+Danach kann einem bestehenden Spiel unter Kenntnis des Passworts beigetreten oder ein neues Spiel erstellt werden.
 
 ## Welche Daten werden gespeichert?
 
