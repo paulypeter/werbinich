@@ -76,6 +76,7 @@ class Werbinich(object):
             games_list = self.get_list_of_games()
             success = "Angemeldet."
             saved_game_id = self.redis.hget(username, "game_id")
+            response.set_cookie("username", username)
             if saved_game_id != "None":
                 success = "Spiel beigetreten."
                 player_list = self.get_other_players(username)
@@ -85,7 +86,6 @@ class Werbinich(object):
                 self.redis.hset(username, "session_id", sid)
                 return response
             response = self.render_template('join_game.html', error=None, success=success, game_list=games_list)
-            response.set_cookie("username", username)
             if request.session.should_save:
                 session_store.save(request.session)
             response.set_cookie("session_id", request.session.sid)
