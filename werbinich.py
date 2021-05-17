@@ -75,16 +75,17 @@ class Werbinich(object):
         if pw_hash and sha256.verify(pw, pw_hash):
             games_list = self.get_list_of_games()
             success = "Angemeldet."
-            saved_game_id = self.redis.hget(username, "game_id")
-            if saved_game_id != "None":
-                success = "Spiel beigetreten."
-                player_list = self.get_other_players(username)
-                response = self.render_template('game.html', error=None, success=success, player_list=player_list)
-                response.set_cookie("username", username)
-                response.set_cookie("game_id", saved_game_id)
-                response.set_cookie("session_id", request.session.sid)
-                self.redis.hset(username, "session_id", request.session.sid)
-                return response
+            if "game_id" in self.redis.hkeys(username):
+                saved_game_id = self.redis.hget(username, "game_id")
+                if saved_game_id != "None":
+                    success = "Spiel beigetreten."
+                    player_list = self.get_other_players(username)
+                    response = self.render_template('game.html', error=None, success=success, player_list=player_list)
+                    response.set_cookie("username", username)
+                    response.set_cookie("game_id", saved_game_id)
+                    response.set_cookie("session_id", request.session.sid)
+                    self.redis.hset(username, "session_id", request.session.sid)
+                    return response
             response = self.render_template('join_game.html', error=None, success=success, game_list=games_list)
             if request.session.should_save:
                 session_store.save(request.session)
@@ -237,7 +238,10 @@ class Werbinich(object):
             cookie_sid = request.cookies.get("session_id")
             cookie_game_id = request.cookies.get("game_id")
             saved_session_id = self.redis.hget(cookie_user_name, "session_id")
-            saved_game_id = self.redis.hget(cookie_user_name, "game_id")
+            if "game_id" in self.redis.hkeys(cookie_user_name):
+                saved_game_id = self.redis.hget(cookie_user_name, "game_id")
+            else:
+                saved_game_id = "None"
             return saved_session_id == cookie_sid and saved_game_id == str(cookie_game_id)
         else:
             return False
