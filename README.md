@@ -1,0 +1,36 @@
+# werbinich
+
+complementing https://paulypeter.github.io/werbinichbot/
+
+[Zur Seite](https://werbinich.peter-pauly.eu)
+
+## Was ist das?
+
+Die Seite soll dabei helfen, ohne Klebezettel "Wer bin ich?" zu spielen.
+
+## Wie funktioniert das?
+
+Die Seite funktioniert zusammen mit dem WerBinIchHelferBot. Spieler:innen ohne Telegram können so mitspielen!
+
+Es ist eine Registrierung notwendig.
+
+## Welche Daten werden gespeichert?
+
+Ähnlich zum Bot werden hier gespeichert:
+- der Nutzername
+- der angegebene Name
+- ein Hash des angegebenen Passworts
+
+Beim Verlassen eines Spiels werden für Spieler:innen die Spiel-ID sowie der vergebene Charakter gelöscht.
+
+Die Daten können auf Anfrage gelöscht werden. Irgendwann wird dafür auch eine Funktion zur Verfügung gestellt.
+
+## Requirements
+
+For pip requirements, see `requirements.txt`.
+
+Furthermore, a running `Redis` instance is needed.
+
+__IMPORTANT__
+
+Before running the server in prod, set `use_debugger=False` in `werbinich.py`.
