@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}aktuelles Spiel{% endblock %}
 {% block body %}
-  <h2>Spieler:</h2>
     {% if error %}
       <div class=error><strong>Fehler:</strong> {{ error }}
       </div>
@@ -10,6 +9,7 @@
       <div class=success><strong>Erfolg:</strong> {{ success }}
       </div>
     {% endif %}
+  <h2>Charakter eingeben:</h2>
   <form action="" method="POST">
     <p><select name=player id=player>
         {% for key, value in player_list.items() %}
@@ -20,6 +20,8 @@
     <input type="hidden" name=operation value=set_player_character>
     <p><input type="submit" value="   Eintragen   "></p>
   </form>
+  <hr>
+  <h2>Mitspieler:innen</h2>
   <div class="row">
     <div class="column header">Spieler</div>
     <div class="column header">Charakter</div>

@@ -83,7 +83,7 @@ class Werbinich(object):
                 response.set_cookie("username", username)
                 response.set_cookie("game_id", saved_game_id)
                 response.set_cookie("session_id", request.session.sid)
-                self.redis.hset(username, "session_id", sid)
+                self.redis.hset(username, "session_id", request.session.sid)
                 return response
             response = self.render_template('join_game.html', error=None, success=success, game_list=games_list)
             if request.session.should_save:
@@ -99,6 +99,7 @@ class Werbinich(object):
         return self.render_template("login.html", error=error)
 
     def registration_form(self, request, sid):
+        """ handle clicking registration link """
         return self.render_template('registration_form.html', error=None)
 
     def register(self, request, sid):
@@ -129,6 +130,7 @@ class Werbinich(object):
         return response
 
     def join_game(self, request, sid):
+        """ join or create a game """
         args = list(request.form.keys())
         required = ["game_id", "game_pw"]
         if not all(item in args for item in required):
@@ -160,6 +162,7 @@ class Werbinich(object):
         return response
 
     def set_player_character(self, request, sid):
+        """ define a character for another player """
         args = list(request.form.keys())
         required = ["player", "character"]
         if not all(item in args for item in required):
@@ -174,12 +177,14 @@ class Werbinich(object):
         return response
 
     def reload_game(self, request, sid):
+        """ reload other players in game """
         cookie_user_name = request.cookies.get("username")
         player_list = self.get_other_players(cookie_user_name)
         response = self.render_template('game.html', error=None, success=None, player_list=player_list)
         return response
 
     def leave_game(self, request, sid):
+        """ leave game and transfer host if necessary """
         cookie_user_name = request.cookies.get("username")
         if "game_host" in self.redis.hkeys(cookie_user_name):
             game_id = request.cookies.get("game_id")
@@ -187,6 +192,7 @@ class Werbinich(object):
             game_pw = self.redis.hget(cookie_user_name, "game_pw")
             self.redis.hdel(cookie_user_name, "game_pw")
             self.redis.hdel(cookie_user_name, "game_host")
+            self.redis.hset(cookie_user_name, "character", "None")
             if other_players:
                 new_host = next(iter(other_players.keys()))
                 self.redis.hset(new_host, "game_host", "true")
@@ -224,6 +230,7 @@ class Werbinich(object):
         return res
 
     def check_cookie_data(self, request):
+        """ check whether cookie was tampered with """
         keys = self.redis.scan(0)[1]
         cookie_user_name = request.cookies.get("username")
         if cookie_user_name in keys:
