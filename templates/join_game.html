@@ -1,5 +1,13 @@
 {% extends "layout.html" %}
 {% block title %}Spiel starten{% endblock %}
+{% block login %}
+{% if username %}
+<form action="" method=post>
+  <input type="hidden" name=operation value=logout>
+  <p><input type=submit class=logoutlink value="{{ username }} abmelden"></p>
+</form>
+{% endif %}
+{% endblock %}
 {% block body %}
     {% if error %}
       <div class=error><strong>Fehler:</strong> {{ error }}

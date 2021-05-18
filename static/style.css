@@ -103,3 +103,11 @@ hr {
     width: 400px;
     margin: 0 auto;
 }
+
+.logoutlink {
+    color: gray;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    background: darkblue;
+}
