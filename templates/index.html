@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Startseite{% endblock %}
+{% block login %}
+{% if username %}
+<form action="" method=post>
+  <input type="hidden" name=operation value=logout>
+  <p><input type=submit class=logoutlink value="{{ username }} abmelden"></p>
+</form>
+{% endif %}
+{% endblock %}
+{% block body %}
+    {% if error %}
+      <p class=error><strong>Fehler:</strong> {{ error }}
+    {% endif %}
+<form action="" method=post>
+    <input type="hidden" name=operation value=show_games>
+    <p><input type=submit value="   Spiel beitreten   ">
+</form>
+<form action="" method=post>
+    <input type="hidden" name=operation value=enter_new_pw>
+    <p><input type=submit value="   Passwort ändern   ">
+</form>
+{% endblock %}
