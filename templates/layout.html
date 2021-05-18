@@ -7,8 +7,11 @@
 <title>{% block title %}{% endblock %} | WerBinIch?</title>
 <link rel=stylesheet href=/static/style.css type=text/css>
 <div class=topnav>
-  <h1>"Wer bin ich?"</h1>
-  {% block login %}{% endblock %}
+<form action="" method="POST">
+  <input type="hidden" name=operation value=start>
+  <input type="submit" value='"Wer bin ich?"' class=headerlink>
+</form>
+{% block login %}{% endblock %}
 </div>
 <div class=box>
   {% block body %}{% endblock %}

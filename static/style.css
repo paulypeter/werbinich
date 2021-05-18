@@ -104,10 +104,16 @@ hr {
     margin: 0 auto;
 }
 
-.logoutlink {
-    color: gray;
+
+.headerlink {
+    color: white;
     text-decoration: none;
     border: none;
     cursor: pointer;
     background: darkblue;
+}
+
+.logoutlink {
+    color: gray;
+    font-size: 20px;
 }

@@ -285,6 +285,28 @@ class Werbinich(object):
         response.set_cookie("game_id", "None")
         return response
 
+    def start(self, request, sid):
+        username = request.cookies.get("username")
+        return self.render_template("index.html", username=username)
+
+    def index(self, request, sid):
+        return self.on_load(request)
+
+    def show_games(self, request, sid):
+        username = request.cookies.get("username")
+        games_list = self.get_list_of_games()
+        response = self.render_template(
+            'join_game.html',
+            error=None,
+            game_list=games_list,
+            username=username
+        )
+        return response
+
+    def enter_new_password(self, request, sid):
+        username = request.cookies.get("username")
+        return self.render_template("change_pw.html", username=username)
+
     def get_list_of_games(self):
         """ get a `set` of game IDs """
         keys = self.redis.scan(0)[1]
