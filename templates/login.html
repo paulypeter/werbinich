@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}Anmelden{% endblock %}
 {% block body %}
+<h1>Wer bin ich?</h1>
     {% if error %}
       <div class=error><strong>Fehler:</strong> {{ error }}
         </div>
@@ -16,10 +17,8 @@
       <p><input type="hidden" name=operation value=login>
       <p><input type=submit class=button value="   Anmelden   ">
   </form>
-  <hr>
   <form action="" method=post>
-  <p>Noch nicht registriert?</p>
   <input type="hidden" name=operation value=registration_form>
-  <p><input type=submit class=textlink value="Hier klicken"></p>
+  <p><input type=submit class=textlink value="Registrieren"></p>
   </form>
 {% endblock %}
