@@ -1,4 +1,4 @@
-# [werbinich](https://werbinich.peter-pauly.eu)
+# [werbinich](https://www.werbinich.xyz)
 
 "Wer bin ich?" zu spielen ist zurzeit ein wenig kompliziert, wenn alle wissen wollen, welche Charaktere den anderen Personen zugewiesen wurden.
 Hier ist die Lösung dafür!
