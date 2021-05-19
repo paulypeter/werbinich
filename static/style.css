@@ -1,52 +1,106 @@
 *
 {
-    margin:10px;
-    padding:0px;
     font-family: Helvetica, sans-serif;
     font-size: 12pt;
+    color: white;
+}
+
+body {
+    display: grid;
+    height: 100%;
+    min-height: 100vh;
+    margin: 0px;
+    place-items: center;
+    background: rgb(0,160,242);
+    background: linear-gradient(25deg, rgb(0, 96, 145) 0%, rgb(21, 124, 18) 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: fixed;
+    background-attachment: fixed;
 }
 
 .box {
     width: auto;
+    margin:10px;
+    padding:0px;
     text-align: center;
-} 
-.column {
-    display: inline-block;
+    position: relative;
+    width: 400px;
+    display: grid;
+    place-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 26px 42px rgba(0, 0, 0, 0.1);
 }
 
-.topnav {
-    text-align: center;
-    background: darkblue;
-    padding: 10px;
-    color: white;
-    width: 400px;
-    margin: 0 auto;
+.column {
+    display: inline-block;
 }
 
 .header {
     font-weight: bold;
 }
 
-input, select{
-    border-radius: 5px;
+input[type=text], input[type=password], select, .button {
     padding: 2px;
     padding-top: 5px;
+    padding-left: 12px;
+    box-sizing: border-box;
     margin: 2px;
+    width: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 26px 42px rgba(0, 0, 0, 0.1);
+}
+
+input::placeholder {
+    color: white;
 }
 
 select {
-    width: 170px;
+    width: 200px;
     cursor: pointer;
 }
 
-.button, .clickable {
+.button, .delete-button {
     cursor: pointer;
+    border-radius: 12px;
+    padding-left: 0px;
+    background: blue;
+    color: white;
+}
+
+.delete-button {
+    background: rgb(172, 0, 0);
+}
+
+.plain-button {
+    background-color: transparent;
+    color: blue;
+    border: 1px solid blue;
+}
+
+.clickable {
+    cursor: pointer;
+    width: 100%;
+    margin: 5px;
 }
 
 .textlink {
-    text-decoration: underline;
+    text-decoration: none;
     border: none;
     cursor: pointer;
+    background: transparent;
 }
 
 .column {
@@ -54,28 +108,10 @@ select {
     vertical-align: middle;
 }
 
-.container {
-    width: 400px;
-    margin: 0 auto;
-}
-
-.left {
-    float: left;
-}
-
-.right {
-    float: right;
-}
-
-.sideform {
-    padding: 0px;
-    margin: 0px;
-}
-
 .error {
-    border-radius: 5px;
+    border-radius: 12px;
     border: solid red;
-    width: 400px;
+    width: 300px;
     margin: 0 auto;
     padding-top: 5px;
     background: rgba(255, 0, 0, 0.4);;
@@ -84,9 +120,9 @@ select {
 }
 
 .success {
-    border-radius: 5px;
+    border-radius: 12px;
     border: solid green;
-    width: 400px;
+    width: 300px;
     margin: 0 auto;
     padding-top: 5px;
     background: rgba(0, 255, 0, 0.4);;
@@ -96,27 +132,18 @@ select {
 
 @keyframes fade {
     0% { opacity: 1 }
-    100% { opacity: 0 }
+    100% { opacity: 0; visibility: none; }
 }
 
-hr {
-    width: 400px;
-    margin: 0 auto;
+h1 {
+    font-size: 32px;
 }
 
-
-.headerlink {
-    color: white;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    background: darkblue;
-    font-size: 20px;
+.row {
+    margin:5px;
+    padding:0px;
 }
 
-.logoutlink {
-    color: gray;
-    border: none;
-    cursor: pointer;
-    background: darkblue;
+.wrapper {
+    position: relative;
 }

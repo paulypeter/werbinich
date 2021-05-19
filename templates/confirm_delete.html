@@ -14,7 +14,11 @@
     {% endif %}
 <h2>Daten wirklich löschen?</h2>
 <form action="" method=post>
+  <input type="hidden" name=operation value=start>
+  <p><input type=submit class="button" value="Nein, doch nicht!">
+</form>
+<form action="" method=post>
     <input type="hidden" name=operation value=confirm_delete>
-    <p><input type=submit class=button value="   Ja, meine Daten löschen   ">
+    <p><input type=submit class="button delete-button" value="Ja, meine Daten löschen">
 </form>
 {% endblock %}

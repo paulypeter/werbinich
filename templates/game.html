@@ -9,13 +9,14 @@
 {% endif %}
 {% endblock %}
 {% block body %}
+    <h1>Wer bin ich?</h1>
     {% if error %}
-      <div class=error><strong>Fehler:</strong> {{ error }}
-      </div>
-    {% endif %}
-    {% if success %}
+      <p class=error><strong>Fehler:</strong> {{ error }}
+    {% elif success %}
       <div class=success><strong>Erfolg:</strong> {{ success }}
       </div>
+    {% else %}
+      <p></p>
     {% endif %}
   <h2>Charakter eingeben:</h2>
   <form action="" method="POST">
@@ -26,10 +27,16 @@
     </select></p>
     <p><input type="text" placeholder="Charakter" name=character required></p>
     <input type="hidden" name=operation value=set_player_character>
-    <p><input type="submit" value="   Eintragen   "></p>
+    <p><input type="submit" class=button value="Eintragen"></p>
   </form>
-  <hr>
+  {% endblock %}
+  {% block body2 %}
+  <div class=box>
   <h2>Mitspieler:innen in {{ game_id }}</h2>
+  <form action="" method="POST">
+    <input type="hidden" name=operation value=reload_game>
+    <p><input type="submit" class=textlink value="Neu laden"></p>
+  </form>
   <div class="row">
     <div class="column header">Name</div>
     <div class="column header">Charakter</div>
@@ -41,13 +48,13 @@
     <div class=column>{{ value["character"] }}</div>
   </div>
   {% endfor %}
+  {% else %}
+    <p>Du spielst noch allein.</p>
   {% endif %}
-  <form action="" method="POST">
-    <input type="hidden" name=operation value=reload_game>
-    <p><input type="submit" value="   Neu laden   "></p>
-  </form>
+  
   <form action="" method=post>
-    <p><input type=submit class=button value="   Spiel verlassen   "></p>
+    <p><input type=submit class="button plain-button" value="Spiel verlassen"></p>
     <input type=hidden name=operation value=leave_game>
   </form>
+</div>
 {% endblock %}
