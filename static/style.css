@@ -111,9 +111,12 @@ hr {
     border: none;
     cursor: pointer;
     background: darkblue;
+    font-size: 20px;
 }
 
 .logoutlink {
     color: gray;
-    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    background: darkblue;
 }

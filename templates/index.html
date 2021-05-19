@@ -4,7 +4,7 @@
 {% if username %}
 <form action="" method=post>
   <input type="hidden" name=operation value=logout>
-  <p><input type=submit class=logoutlink value="{{ username }} abmelden"></p>
+  <p><input type=submit class="logoutlink" value="{{ username }} abmelden"></p>
 </form>
 {% endif %}
 {% endblock %}
@@ -12,12 +12,20 @@
     {% if error %}
       <p class=error><strong>Fehler:</strong> {{ error }}
     {% endif %}
+    {% if success %}
+      <div class=success><strong>Erfolg:</strong> {{ success }}
+      </div>
+    {% endif %}
 <form action="" method=post>
     <input type="hidden" name=operation value=show_games>
-    <p><input type=submit value="   Spiel beitreten   ">
+    <p><input type=submit class=button value="   Einem Spiel beitreten   ">
 </form>
 <form action="" method=post>
     <input type="hidden" name=operation value=enter_new_pw>
-    <p><input type=submit value="   Passwort ändern   ">
+    <p><input type=submit class=button value="   Passwort ändern   ">
+</form>
+<form action="" method=post>
+  <input type="hidden" name=operation value=delete_user_data>
+  <p><input type=submit class=button value="   Meine Daten löschen   ">
 </form>
 {% endblock %}

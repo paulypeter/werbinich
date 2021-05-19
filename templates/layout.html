@@ -6,6 +6,7 @@
 <link rel="shortcut icon" href="/static/favicon.ico">
 <title>{% block title %}{% endblock %} | WerBinIch?</title>
 <link rel=stylesheet href=/static/style.css type=text/css>
+<div class=wrapper>
 <div class=topnav>
 <form action="" method="POST">
   <input type="hidden" name=operation value=start>
@@ -15,4 +16,5 @@
 </div>
 <div class=box>
   {% block body %}{% endblock %}
+</div>
 </div>

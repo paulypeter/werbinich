@@ -110,10 +110,9 @@ class Werbinich(object):
                     self.redis.hset(username, "session_id", request.session.sid)
                     return response
             response = self.render_template(
-                'join_game.html',
+                'index.html',
                 error=None,
                 success=success,
-                game_list=games_list,
                 username=username
             )
             if request.session.should_save:
@@ -152,10 +151,9 @@ class Werbinich(object):
         games_list = self.get_list_of_games()
         success = "Registriert und angemeldet."
         response = self.render_template(
-            'join_game.html',
+            'index.html',
             error=None,
             success=success,
-            game_list=games_list,
             username=username
         )
         response.set_cookie("username", username)
@@ -270,9 +268,8 @@ class Werbinich(object):
                 self.redis.hset(new_host, "game_pw", game_pw)
         games_list = self.get_list_of_games()
         response = self.render_template(
-            'join_game.html',
+            'index.html',
             error=None,
-            game_list=games_list,
             username=cookie_user_name
         )
         response.set_cookie("game_id", "None")
@@ -303,9 +300,38 @@ class Werbinich(object):
         )
         return response
 
-    def enter_new_password(self, request, sid):
+    def enter_new_pw(self, request, sid):
         username = request.cookies.get("username")
         return self.render_template("change_pw.html", username=username)
+
+    def set_new_pw(self, request, sid):
+        args = list(request.form.keys())
+        required = ["old_pw", "new_pw", "new_pw_confirm"]
+        if not all(item in args for item in required):
+            error = "Das funktioniert nicht."
+            return self.render_template('login.html', error=error)
+        username = request.cookies.get("username")
+        old_pw = request.form["old_pw"]
+        new_pw = request.form["new_pw"]
+        new_pw_confirm = request.form["new_pw_confirm"]
+        pw_hash = self.get_user_pw(username)
+        if pw_hash and sha256.verify(old_pw, pw_hash) and new_pw == new_pw_confirm:
+            self.set_user_pw(username, new_pw)
+            success = "Passwort geändert.\n\nBitte neu einloggen!"
+            return self.render_template("login.html", success=success)
+        else:
+            error = "Das hat nicht geklappt."
+            return self.render_template("change_pw.html", error=error)
+
+    def delete_user_data(self, request, sid):
+        username = request.cookies.get("username")
+        return self.render_template("confirm_delete.html", username=username)
+
+    def confirm_delete(self, request, sid):
+        username = request.cookies.get("username")
+        self.redis.delete(username)
+        success = "Daten gelöscht."
+        return self.render_template("login.html", success=success)
 
     def get_list_of_games(self):
         """ get a `set` of game IDs """
@@ -317,6 +343,11 @@ class Werbinich(object):
                 if not game_id in games_list and game_id != "None":
                     games_list.append(game_id)
         return games_list
+
+    def set_user_pw(self, username, password):
+        """ insert new pw hash into db """
+        pw_hash = sha256.hash(password)
+        self.redis.hset(username, "pw_hash", pw_hash)
 
     def set_user_name_and_pw(self, username, name, password):
         """ insert name, pw into db """
