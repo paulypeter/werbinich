@@ -1,3 +1,5 @@
+![GitHub](https://img.shields.io/github/license/paulypeter/werbinich) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/paulypeter/werbinich) ![GitHub issues](https://img.shields.io/github/issues-raw/paulypeter/werbinich)
+
 # werbinich
 
 complementing https://paulypeter.github.io/werbinichbot/
