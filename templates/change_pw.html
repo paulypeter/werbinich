@@ -20,8 +20,10 @@
     <input type="hidden" name=operation value=set_new_pw>
     <p><input type=submit class=button value="Passwort ändern">
   </form>
+  {% if back_link %}
   <form action="" method=post>
     <input type="hidden" name=operation value=start>
     <p><input type=submit class=textlink value="zurück"></p>
     </form>
+    {% endif %}
 {% endblock %}

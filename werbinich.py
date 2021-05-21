@@ -89,6 +89,13 @@ class Werbinich(object):
         pw = request.form["login_pw"]
         pw_hash = self.get_user_pw(username)
         if pw_hash and sha256.verify(pw, pw_hash):
+            if "change_pw" in self.redis.hkeys(username):
+                response = self.render_template("change_pw.html")
+                response.set_cookie("username", username)
+                response.set_cookie("session_id", request.session.sid)
+                self.redis.hset(username, "session_id", request.session.sid)
+                self.redis.hdel(username, "change_pw")
+                return response
             games_list = self.get_list_of_games()
             success = "Angemeldet."
             if "game_id" in self.redis.hkeys(username):
@@ -305,7 +312,7 @@ class Werbinich(object):
 
     def enter_new_pw(self, request, sid):
         username = request.cookies.get("username")
-        return self.render_template("change_pw.html", username=username)
+        return self.render_template("change_pw.html", username=username, back_link="true")
 
     def set_new_pw(self, request, sid):
         args = list(request.form.keys())
@@ -324,7 +331,7 @@ class Werbinich(object):
             return self.render_template("login.html", success=success)
         else:
             error = "Das hat nicht geklappt."
-            return self.render_template("change_pw.html", error=error)
+            return self.render_template("change_pw.html", error=error, back_link="true")
 
     def delete_user_data(self, request, sid):
         username = request.cookies.get("username")
