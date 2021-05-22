@@ -89,7 +89,7 @@ class Werbinich(object):
         pw = request.form["login_pw"]
         pw_hash = self.get_user_pw(username)
         if pw_hash and sha256.verify(pw, pw_hash):
-            if "change_pw" in self.redis.hkeys(username):
+            if self.redis.hexists(username, "change_pw"):
                 response = self.render_template("change_pw.html")
                 response.set_cookie("username", username)
                 response.set_cookie("session_id", request.session.sid)
@@ -98,7 +98,7 @@ class Werbinich(object):
                 return response
             games_list = self.get_list_of_games()
             success = "Angemeldet."
-            if "game_id" in self.redis.hkeys(username):
+            if self.redis.hexists(username, "game_id"):
                 saved_game_id = self.redis.hget(username, "game_id")
                 if saved_game_id != "None":
                     success = "Spiel beigetreten."
@@ -265,12 +265,11 @@ class Werbinich(object):
     def leave_game(self, request, sid):
         """ leave game and transfer host if necessary """
         cookie_user_name = request.cookies.get("username")
-        if "game_host" in self.redis.hkeys(cookie_user_name):
+        if self.redis.hexists(cookie_user_name, "game_host"):
             game_id = request.cookies.get("game_id")
             other_players = self.get_other_players(cookie_user_name)
             game_pw = self.redis.hget(cookie_user_name, "game_pw")
-            self.redis.hdel(cookie_user_name, "game_pw")
-            self.redis.hdel(cookie_user_name, "game_host")
+            self.redis.hdel(cookie_user_name, "game_pw", "game_host")
             self.redis.hset(cookie_user_name, "character", "None")
             if other_players:
                 new_host = next(iter(other_players.keys()))
@@ -382,7 +381,7 @@ class Werbinich(object):
             cookie_sid = request.cookies.get("session_id")
             cookie_game_id = request.cookies.get("game_id")
             saved_session_id = self.redis.hget(cookie_user_name, "session_id")
-            if "game_id" in self.redis.hkeys(cookie_user_name):
+            if self.redis.hexists(cookie_user_name, "game_id"):
                 saved_game_id = self.redis.hget(cookie_user_name, "game_id")
             else:
                 saved_game_id = "None"
@@ -397,9 +396,10 @@ class Werbinich(object):
         user_game_id = self.redis.hget(user_id, "game_id")
         for key in keys:
             if self.redis.hget(key, "game_id") == str(user_game_id) and str(user_id) != key:
+                name, character = self.redis.hmget(key, "name", "character")
                 player_list[key] = {
-                    "name": self.redis.hget(key, "name"),
-                    "character": self.redis.hget(key, "character")
+                    "name": name,
+                    "character": character if str(character) != "None" else "-"
                 }
         return player_list
 
@@ -408,7 +408,7 @@ class Werbinich(object):
         keys = self.redis.scan(0)[1]
         res = "None"
         for key in keys:
-            if "game_host" in self.redis.hkeys(key) and self.redis.hget(key, "game_id") == game_id:
+            if self.redis.hexists(key, "game_host") and self.redis.hget(key, "game_id") == game_id:
                 res = str(self.redis.hget(key, "game_pw"))
         return res
 
