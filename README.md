@@ -4,7 +4,7 @@
 
 complementing https://paulypeter.github.io/werbinichbot/
 
-[Zur Seite](https://werbinich.peter-pauly.eu)
+[Zur Seite](https://werbinich.xyz)
 
 ## Was ist das?
 
