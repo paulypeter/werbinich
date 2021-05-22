@@ -1,13 +1,5 @@
 {% extends "layout.html" %}
 {% block title %}Spiel starten{% endblock %}
-{% block login %}
-{% if username %}
-<form action="" method=post>
-  <input type="hidden" name=operation value=logout>
-  <p><input type=submit class=logoutlink value="{{ username }} abmelden"></p>
-</form>
-{% endif %}
-{% endblock %}
 {% block body %}
 <h1>Wer bin ich?</h1>
   {% if error %}
@@ -40,5 +32,13 @@
   {% else %}
     <p>Momentan gibt es keine Spiele.</p>
   {% endif %}
+</div>
+{% endblock %}
+{% block impressum_link %}
+<div class="box bottom-box">
+  <form action="" method=post>
+    <input type="hidden" name=operation value=impressum_auth>
+    <p><input type=submit class=textlink value="Datenschutz und Impressum"></p>
+    </form>
 </div>
 {% endblock %}

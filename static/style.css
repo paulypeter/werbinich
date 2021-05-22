@@ -38,6 +38,10 @@ body {
     box-shadow: 0 26px 42px rgba(0, 0, 0, 0.1);
 }
 
+.bottom-box {
+    bottom: 0;
+}
+
 .column {
     display: inline-block;
 }
@@ -150,4 +154,13 @@ h1 {
 
 .wrapper {
     position: relative;
+}
+
+.text-content {
+    width: 300px;
+    margin: 0 auto;
+}
+
+.check {
+    width: 200px;
 }

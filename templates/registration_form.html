@@ -10,6 +10,9 @@
     <p><input type=text name=username placeholder="Nutzername" title="Damit meldest Du Dich an." required>
     <p><input type="password" placeholder="Passwort" name=pw required>
     <p><input type="password" name=pw_confirm placeholder="Passwort bestätigen" required>
+      <p><div class=check><input type="checkbox" name=datenschutz id=datenschutz_check required>
+        <label for=datenschutz_check>Ich habe die Datenschutzerklärung gelesen und stimme den Bedingungen zu.
+        </label></div></p>
     <input type="hidden" name=operation value=register>
     <p><input type=submit class=button value="Registrieren">
   </form>
@@ -17,4 +20,12 @@
     <input type="hidden" name=operation value=cancel_registration>
     <p><input type=submit class=textlink value="zurück"></p>
     </form>
+{% endblock %}
+{% block impressum_link %}
+<div class="box bottom-box">
+  <form action="" method=post>
+    <input type="hidden" name=operation value=impressum>
+    <p><input type=submit class=textlink value="Datenschutz und Impressum"></p>
+    </form>
+</div>
 {% endblock %}
