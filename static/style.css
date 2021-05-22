@@ -72,6 +72,10 @@ select {
     cursor: pointer;
 }
 
+select option {
+    color: black;
+}
+
 .button, .delete-button {
     cursor: pointer;
     border-radius: 12px;
