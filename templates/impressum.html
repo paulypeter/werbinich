@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}Impressum{% endblock %}
+
+{% block body %}
+<h1>Datenschutz und Cookies</h1>
+
+<div class=text-content>
+Diese Webseite setzt bei der Registrierung oder Anmeldung Cookies.
+Darin gespeichert werden der Nutzername, eine Session-ID sowie ggf. der Name des aktuellen Spiels der Nutzerin oder des Nutzers.<br><br>
+
+Diese Daten werden ebenfalls auf dem Server gespeichert.
+Zusätzlich werden das vergebene Passwort (verschlüsselt) und der angegebene Anzeigename gespeichert.<br><br>
+
+Darüber hinaus werden keine weiteren personenbezogenen Daten erhoben.<br><br>
+
+Es werden keine Daten an Dritte weitergegeben.<br><br>
+</div>
+<h1>Impressum</h1>
+
+<h4>Verantwortlicher</h4>
+Peter Pauly<br>
+Bienroder Weg 54<br>
+38108 Braunschweig<br>
+
+<h4>Kontakt</h4>
+&lt;vorname.nachname&gt; (at) mail (punkt) de
+<p></p>
+{% endblock %}
+{% block body2 %}
+<div class=box><form action="" method=post>
+    {% if auth %}
+    <input type="hidden" name=operation value=start>
+    {% else %}
+    <input type="hidden" name=operation value=cancel_registration>
+    {% endif %}
+    <p><input type=submit class=textlink value="zurück"></p>
+</form>
+</div>
+{% endblock %}
