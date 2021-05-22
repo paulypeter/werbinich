@@ -165,19 +165,22 @@ class Werbinich(object):
         pw_confirm = request.form["pw_confirm"]
         if pw == pw_confirm:
             self.set_user_name_and_pw(username, name, pw)
-        games_list = self.get_list_of_games()
-        success = "Registriert und angemeldet."
-        response = self.render_template(
-            'index.html',
-            error=None,
-            success=success,
-            username=username
-        )
-        response.set_cookie("username", username)
-        if request.session.should_save:
-            session_store.save(request.session)
-        response.set_cookie("session_id", request.session.sid)
-        self.redis.hset(username, "session_id", sid)
+            games_list = self.get_list_of_games()
+            success = "Registriert und angemeldet."
+            response = self.render_template(
+                'index.html',
+                error=None,
+                success=success,
+                username=username
+            )
+            response.set_cookie("username", username)
+            if request.session.should_save:
+                session_store.save(request.session)
+            response.set_cookie("session_id", request.session.sid)
+            self.redis.hset(username, "session_id", sid)
+        else:
+            error = "Die Passwörter stimmen nicht überein."
+            response = self.render_template('registration_form.html', error=error)
         return response
 
     def join_game(self, request, sid):
