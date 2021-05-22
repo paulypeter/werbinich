@@ -56,7 +56,14 @@ class Werbinich(object):
             request.session = session_store.get(sid)
         if request.method == 'POST':
             op = request.form["operation"]
-            if self.check_cookie_data(request) or op in ["login", "registration_form", "register", "logout", "cancel_registration"]:
+            if self.check_cookie_data(request) or op in [
+                "login",
+                "registration_form",
+                "register",
+                "logout",
+                "cancel_registration",
+                "impressum"
+            ]:
                 return getattr(self, op)(request, sid)  # call operation method
             else:
                 error = "Dieser Cookie schmeckt komisch..."
@@ -297,6 +304,12 @@ class Werbinich(object):
 
     def index(self, request, sid):
         return self.on_load(request)
+
+    def impressum(self, request, sid):
+        return self.render_template("impressum.html", auth=False)
+
+    def impressum_auth(self, request, sid):
+        return self.render_template("impressum.html", auth=True)
 
     def show_games(self, request, sid):
         username = request.cookies.get("username")

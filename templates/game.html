@@ -50,3 +50,11 @@
   </form>
 </div>
 {% endblock %}
+{% block impressum_link %}
+<div class="box bottom-box">
+  <form action="" method=post>
+    <input type="hidden" name=operation value=impressum_auth>
+    <p><input type=submit class=textlink value="Datenschutz und Impressum"></p>
+    </form>
+</div>
+{% endblock %}
