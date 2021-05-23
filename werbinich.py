@@ -20,7 +20,7 @@ class Werbinich(object):
         self.redis = redis.StrictRedis(decode_responses=True, db=2)
         template_path = os.path.join(os.path.dirname(__file__), 'templates')
         self.jinja_env = Environment(loader=FileSystemLoader(template_path),
-                                 autoescape=True)
+                                 autoescape=True, extensions=["jinja2.ext.do",])
         self.url_map = Map([
             Rule('/', endpoint='load'),
         ])
@@ -267,6 +267,9 @@ class Werbinich(object):
     def reload_game(self, request, sid):
         """ reload other players in game """
         cookie_user_name = request.cookies.get("username")
+        form_keys = list(request.form.keys())
+        player_ids = request.form["player_ids"].split(";")
+
         player_list = self.get_other_players(cookie_user_name)
         game_id = self.redis.hget(cookie_user_name, "game_id")
         response = self.render_template(
@@ -301,6 +304,7 @@ class Werbinich(object):
         response.set_cookie("game_id", "None")
         self.redis.hset(cookie_user_name, "game_id", "None")
         self.redis.hset(cookie_user_name, "character", "None")
+        self.redis.hset(cookie_user_name, "solved", "false")
         return response
 
     def logout(self, request, sid):
