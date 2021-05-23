@@ -236,6 +236,8 @@ class Werbinich(object):
 
     def set_player_character(self, request, sid):
         """ define a character for another player """
+        success = None
+        error = None
         args = list(request.form.keys())
         required = ["player", "character"]
         if not all(item in args for item in required):
@@ -244,13 +246,17 @@ class Werbinich(object):
         cookie_user_name = request.cookies.get("username")
         player_id = request.form["player"]
         player_character = request.form["character"]
-        self.redis.hset(player_id, "character", player_character)
+        old_character = self.redis.hget(player_id, "character")
+        if old_character is None or str(old_character) == "None":
+            self.redis.hset(player_id, "character", player_character)
+        else:
+            error = "Da steht schon ein Charakter."
         game_id = self.redis.hget(player_id, "game_id")
         player_list = self.get_other_players(cookie_user_name)
         response = self.render_template(
             'game.html',
-            error=None,
-            success=None,
+            error=error,
+            success=success,
             player_list=player_list,
             username=cookie_user_name,
             game_id=game_id
