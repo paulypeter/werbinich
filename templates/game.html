@@ -14,7 +14,9 @@
   <form action="" method="POST">
     <p><select name=player id=player>
         {% for key, value in player_list.items() %}
+        {% if value["character"] == "-" or value["character"] == "None" %}
         <option value={{ key }}>{{ value["name"] }}</option>
+        {% endif %}
         {% endfor %}
     </select></p>
     <p><input type="text" placeholder="Charakter" name=character required></p>
