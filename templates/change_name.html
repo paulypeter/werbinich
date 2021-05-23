@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Namen ändern{% endblock %}
+{% block body %}
+    {% if error %}
+      <p class=error><strong>Fehler:</strong> {{ error }}
+    {% endif %}
+    <h2>Neuen Namen und Passwort eingeben:</h2>
+    <form action="" method=post>
+      <p><input type="text" name=new_name placeholder="Neuer Anzeigename" required>
+    <p><input type="password" placeholder="Passwort" name=pw required>
+    <input type="hidden" name=operation value=set_new_name>
+    <p><input type=submit class=button value="Namen ändern">
+  </form>
+  <form action="" method=post>
+    <input type="hidden" name=operation value=start>
+    <p><input type=submit class=textlink value="zurück"></p>
+  </form>
+{% endblock %}
+{% block impressum_link %}
+<div class="box bottom-box">
+  <form action="" method=post>
+    <input type="hidden" name=operation value=impressum_auth>
+    <p><input type=submit class=textlink value="Datenschutz und Impressum"></p>
+    </form>
+</div>
+{% endblock %}
