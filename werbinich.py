@@ -247,8 +247,10 @@ class Werbinich(object):
         player_id = request.form["player"]
         player_character = request.form["character"]
         old_character = self.redis.hget(player_id, "character")
-        if old_character is None or str(old_character) == "None":
+        character_solved = self.redis.hget(player_id, "solved")
+        if old_character is None or str(old_character) == "None" or character_solved == "true":
             self.redis.hset(player_id, "character", player_character)
+            self.redis.hset(player_id, "solved", "false")
         else:
             error = "Da steht schon ein Charakter."
         game_id = self.redis.hget(player_id, "game_id")
@@ -299,6 +301,8 @@ class Werbinich(object):
         )
         response.set_cookie("game_id", "None")
         self.redis.hset(cookie_user_name, "game_id", "None")
+        self.redis.hset(cookie_user_name, "character", "None")
+        self.redis.hset(cookie_user_name, "solved", "false")
         return response
 
     def logout(self, request, sid):
@@ -387,6 +391,26 @@ class Werbinich(object):
             response = self.render_template('change_name.html', error=error)
         return response
 
+    def toggle_solved(self, request, sid):
+        error = None
+        user_id = request.form["user_id"]
+        if not user_id:
+            error = "Das funktioniert nicht."
+            player_list = self.get_other_players(cookie_user_name)
+            game_id = self.redis.hget(cookie_user_name, "game_id")
+            response = self.render_template(
+                'game.html',
+                error=None,
+                success=None,
+                player_list=player_list,
+                username=cookie_user_name,
+                game_id=game_id
+            )
+        if self.redis.hget(user_id, "solved") == "true":
+            self.redis.hset(user_id, "solved", "false")
+        else:
+            self.redis.hset(user_id, "solved", "true")
+        return self.reload_game(request, sid)
 
     def get_list_of_games(self):
         """ get a `set` of game IDs """
@@ -445,10 +469,11 @@ class Werbinich(object):
         user_game_id = self.redis.hget(user_id, "game_id")
         for key in keys:
             if self.redis.hget(key, "game_id") == str(user_game_id) and str(user_id) != key:
-                name, character = self.redis.hmget(key, "name", "character")
+                name, character, solved = self.redis.hmget(key, "name", "character", "solved")
                 player_list[key] = {
                     "name": name,
-                    "character": character if str(character) != "None" else "-"
+                    "character": character if str(character) != "None" else "-",
+                    "solved": solved
                 }
         return player_list
 
