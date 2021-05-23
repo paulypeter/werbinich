@@ -30,16 +30,18 @@
   <form action="" method="POST">
     <input type="hidden" name=operation value=reload_game>
     <p><input type="submit" class="textlink" value="↻ Neu laden"></p>
-  </form>
   <div class="row">
     <div class="column header">Name</div>
     <div class="column header">Charakter</div>
+    <div class="column header">gelöst</div>
   </div>
+</form>
   {% if player_list %}
   {% for key, value in player_list.items() %}
   <div class=row>
     <div class=column>{{ value["name"] }}</div>
     <div class=column>{{ value["character"] }}</div>
+    <div class=column><input type="checkbox" id=solved_{{ key }}{{ value["solved"] }}></div>
   </div>
   {% endfor %}
   {% else %}
