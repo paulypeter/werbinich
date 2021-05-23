@@ -301,6 +301,7 @@ class Werbinich(object):
         response.set_cookie("game_id", "None")
         self.redis.hset(cookie_user_name, "game_id", "None")
         self.redis.hset(cookie_user_name, "character", "None")
+        self.redis.hset(cookie_user_name, "solved", "false")
         return response
 
     def logout(self, request, sid):
@@ -389,6 +390,26 @@ class Werbinich(object):
             response = self.render_template('change_name.html', error=error)
         return response
 
+    def toggle_solved(self, request, sid):
+        error = None
+        user_id = request.form["user_id"]
+        if not user_id:
+            error = "Das funktioniert nicht."
+            player_list = self.get_other_players(cookie_user_name)
+            game_id = self.redis.hget(cookie_user_name, "game_id")
+            response = self.render_template(
+                'game.html',
+                error=None,
+                success=None,
+                player_list=player_list,
+                username=cookie_user_name,
+                game_id=game_id
+            )
+        if self.redis.hget(user_id, "solved") == "true":
+            self.redis.hset(user_id, "solved", "false")
+        else:
+            self.redis.hset(user_id, "solved", "true")
+        return self.reload_game(request, sid)
 
     def get_list_of_games(self):
         """ get a `set` of game IDs """
@@ -451,7 +472,7 @@ class Werbinich(object):
                 player_list[key] = {
                     "name": name,
                     "character": character if str(character) != "None" else "-",
-                    "solved": " checked" if solved == "true" else ""
+                    "solved": solved
                 }
         return player_list
 

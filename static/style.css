@@ -117,6 +117,14 @@ select option {
     background: transparent;
 }
 
+.textlink-plain {
+    text-decoration: none;
+    color: white;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+}
+
 .column {
     width: 100px;
     vertical-align: middle;
