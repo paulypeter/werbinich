@@ -247,7 +247,8 @@ class Werbinich(object):
         player_id = request.form["player"]
         player_character = request.form["character"]
         old_character = self.redis.hget(player_id, "character")
-        if old_character is None or str(old_character) == "None":
+        character_solved = self.redis.hget(player_id, "solved")
+        if old_character is None or str(old_character) == "None" or character_solved == "true":
             self.redis.hset(player_id, "character", player_character)
             self.redis.hset(player_id, "solved", "false")
         else:
