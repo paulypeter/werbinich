@@ -358,6 +358,30 @@ class Werbinich(object):
         success = "Daten gelöscht."
         return self.render_template("login.html", success=success)
 
+    def enter_new_name(self, request, sid):
+        return self.render_template("change_name.html")
+
+    def set_new_name(self, request, sid):
+        error = None
+        args = list(request.form.keys())
+        required = ["pw", "new_name"]
+        if not all(item in args for item in required):
+            error = "Das funktioniert nicht."
+            return self.render_template('login.html', error=error)
+        username = request.cookies.get("username")
+        pw = request.form["pw"]
+        new_name = request.form["new_name"]
+        pw_hash = self.get_user_pw(username)
+        if sha256.verify(pw, pw_hash):
+            self.set_user_name(username, new_name)
+            success = "Anzeigename geändert."
+            response = self.render_template('index.html', success=success)
+        else:
+            error = "Falsches Passwort."
+            response = self.render_template('change_name.html', error=error)
+        return response
+
+
     def get_list_of_games(self):
         """ get a `set` of game IDs """
         keys = self.redis.scan(0)[1]
@@ -373,6 +397,9 @@ class Werbinich(object):
         """ insert new pw hash into db """
         pw_hash = sha256.hash(password)
         self.redis.hset(username, "pw_hash", pw_hash)
+
+    def set_user_name(self, username, name):
+        self.redis.hset(username, "name", name)
 
     def set_user_name_and_pw(self, username, name, password):
         """ insert name, pw into db """
