@@ -247,7 +247,7 @@ class Werbinich(object):
         player_id = request.form["player"]
         player_character = request.form["character"]
         old_character = self.redis.hget(player_id, "character")
-        if not old_character:
+        if old_character is None or str(old_character) == "None":
             self.redis.hset(player_id, "character", player_character)
         else:
             error = "Da steht schon ein Charakter."
