@@ -393,6 +393,7 @@ class Werbinich(object):
 
     def toggle_solved(self, request, sid):
         error = None
+        cookie_user_name = request.cookies.get("username")
         user_id = request.form["user_id"]
         if not user_id:
             error = "Das funktioniert nicht."
@@ -400,12 +401,13 @@ class Werbinich(object):
             game_id = self.redis.hget(cookie_user_name, "game_id")
             response = self.render_template(
                 'game.html',
-                error=None,
+                error=error,
                 success=None,
                 player_list=player_list,
                 username=cookie_user_name,
                 game_id=game_id
             )
+            return response
         if self.redis.hget(user_id, "solved") == "true":
             self.redis.hset(user_id, "solved", "false")
         else:
