@@ -26,8 +26,8 @@ Bienroder Weg 54<br>
 &lt;vorname.nachname&gt; (at) mail (punkt) de
 <p></p>
 {% endblock %}
-{% block body2 %}
-<div class=box><form action="" method=post>
+{% block impressum_link %}
+<form action="" method=post>
     {% if auth %}
     <input type="hidden" name=operation value=start>
     {% else %}
@@ -35,5 +35,4 @@ Bienroder Weg 54<br>
     {% endif %}
     <p><input type=submit class=textlink value="zurück"></p>
 </form>
-</div>
 {% endblock %}
