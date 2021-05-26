@@ -198,12 +198,12 @@ class Werbinich(object):
         cookie_user_name = request.cookies.get("username")
         game_id = request.form["game_id"].strip()
         game_pw = request.form["game_pw"].strip()
-        if not validate_username(game_id) or not validate_pw(game_pw):
+        if not validate_username(game_id):
             error = "Bitte gib gültige Daten ein."
             games_list = self.get_list_of_games()
             return self.render_template(
                 'join_game.html',
-                error=None,
+                error=error,
                 game_list=games_list
             )
         games_list = self.get_list_of_games()
