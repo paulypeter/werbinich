@@ -1,0 +1,3 @@
+[submodule "components/py_input_validator"]
+	path = components/py_input_validator
+	url = https://github.com/paulypeter/py_input_validator.git

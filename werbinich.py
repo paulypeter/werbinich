@@ -2,6 +2,11 @@
 import os
 import redis
 
+from components.py_input_validator.validator import (
+    validate_username,
+    validate_pw
+)
+
 from werkzeug.urls import url_parse
 from werkzeug.wrappers import Request, Response
 from werkzeug.routing import Map, Rule
@@ -92,8 +97,8 @@ class Werbinich(object):
         if not all(item in args for item in required):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
-        username = request.form["username"]
-        pw = request.form["login_pw"]
+        username = request.form["username"].strip()
+        pw = request.form["login_pw"].strip()
         pw_hash = self.get_user_pw(username)
         if pw_hash and sha256.verify(pw, pw_hash):
             if self.redis.hexists(username, "change_pw"):
@@ -155,15 +160,15 @@ class Werbinich(object):
         if not all(item in args for item in required):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
-        username = request.form["username"]
+        username = request.form["username"].strip()
         keys = self.redis.scan(0)[1]
         if username in keys:
             error = "Diese:r Nutzer:in existiert bereits."
             return self.render_template('registration_form.html', error=error)
-        name = request.form["name"]
-        pw = request.form["pw"]
-        pw_confirm = request.form["pw_confirm"]
-        if pw == pw_confirm:
+        name = request.form["name"].strip()
+        pw = request.form["pw"].strip()
+        pw_confirm = request.form["pw_confirm"].strip()
+        if pw == pw_confirm and validate_pw(pw) and validate_username(username) and validate_username(username):
             self.set_user_name_and_pw(username, name, pw)
             games_list = self.get_list_of_games()
             success = "Registriert und angemeldet."
@@ -191,8 +196,16 @@ class Werbinich(object):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
         cookie_user_name = request.cookies.get("username")
-        game_id = request.form["game_id"]
-        game_pw = request.form["game_pw"]
+        game_id = request.form["game_id"].strip()
+        game_pw = request.form["game_pw"].strip()
+        if not validate_username(game_id) or not validate_pw(game_pw):
+            error = "Bitte gib gültige Daten ein."
+            games_list = self.get_list_of_games()
+            return self.render_template(
+                'join_game.html',
+                error=None,
+                game_list=games_list
+            )
         games_list = self.get_list_of_games()
         if game_id in games_list:# if game exists
             pw_hash = self.get_game_pw(game_id)
@@ -245,7 +258,7 @@ class Werbinich(object):
             return self.render_template('login.html', error=error)
         cookie_user_name = request.cookies.get("username")
         player_id = request.form["player"]
-        player_character = request.form["character"]
+        player_character = request.form["character"].strip()
         old_character = self.redis.hget(player_id, "character")
         character_solved = self.redis.hget(player_id, "solved")
         if old_character is None or str(old_character) == "None" or character_solved == "true":
@@ -346,11 +359,16 @@ class Werbinich(object):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
         username = request.cookies.get("username")
-        old_pw = request.form["old_pw"]
-        new_pw = request.form["new_pw"]
-        new_pw_confirm = request.form["new_pw_confirm"]
+        old_pw = request.form["old_pw"].strip()
+        new_pw = request.form["new_pw"].strip()
+        new_pw_confirm = request.form["new_pw_confirm"].strip()
         pw_hash = self.get_user_pw(username)
-        if pw_hash and sha256.verify(old_pw, pw_hash) and new_pw == new_pw_confirm:
+        if (
+            pw_hash and
+            sha256.verify(old_pw, pw_hash) and
+            new_pw == new_pw_confirm and
+            validate_pw(new_pw)
+        ):
             self.set_user_pw(username, new_pw)
             success = "Passwort geändert.\n\nBitte neu einloggen!"
             return self.render_template("login.html", success=success)
@@ -379,10 +397,10 @@ class Werbinich(object):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
         username = request.cookies.get("username")
-        pw = request.form["pw"]
-        new_name = request.form["new_name"]
+        pw = request.form["pw"].strip()
+        new_name = request.form["new_name"].strip()
         pw_hash = self.get_user_pw(username)
-        if sha256.verify(pw, pw_hash):
+        if sha256.verify(pw, pw_hash) and validate_username(new_name):
             self.set_user_name(username, new_name)
             success = "Anzeigename geändert."
             response = self.render_template('index.html', success=success)
