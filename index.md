@@ -8,6 +8,8 @@ Wer kein Telegram hat, kann [hier](https://werbinich.peter-pauly.eu) trotzdem mi
 
 Infos zum Bot gibt's [hier](https://paulypeter.github.io/werbinichbot/).
 
+Es gibt auch eine ausführliche [Anleitung](https://paulypeter.github.io/werbinichbot/docs/manual.html)
+
 ## Für die Webseite gilt:
 
 Es ist eine Registrierung notwendig.
