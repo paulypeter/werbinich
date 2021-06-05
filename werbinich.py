@@ -63,16 +63,6 @@ class Werbinich(object):
                 return getattr(self, op)(request, sid)  # call operation method
             else:
                 return self.render_template('login.html', error=error)
-        # if username is not None:#and self.check_cookie_data(request):
-        #     games_list = self.get_list_of_games()
-        #     response = self.render_template(
-        #         "join_game.html",
-        #         error=None,
-        #         success="Angemeldet",
-        #         game_list=games_list,
-        #         username=cookie_user_name
-        #     )
-        #     return response
         response = self.render_template('login.html', error=error)
         return response
 
