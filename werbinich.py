@@ -474,7 +474,9 @@ class Werbinich(object):
         keys = self.redis.scan(0)[1]
         for key in keys:
             if self.redis.hexists(key, "session_id"):
-                return key
+                key_session_id = self.redis.hget(key, "session_id")
+                if key_session_id = session_id:
+                    return key
         return "None"
 
     def set_user_session(self, user, session_id):
