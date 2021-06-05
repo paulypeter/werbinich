@@ -53,41 +53,27 @@ class Werbinich(object):
     def on_load(self, request):
         """ Handle all form submit events """
         error=None
-        sid = request.cookies.get("session_id")
-        if sid is None:
+        if not "session" in dir(request):
             request.session = session_store.new()
-            sid = request.session.sid
-        else:
-            request.session = session_store.get(sid)
+        sid = request.session.sid
+        username = self.get_user(sid)
         if request.method == 'POST':
             op = request.form["operation"]
-            if self.check_cookie_data(request) or op in [
-                "login",
-                "registration_form",
-                "register",
-                "logout",
-                "cancel_registration",
-                "impressum"
-            ]:
+            if username != "None" or op == "login":
                 return getattr(self, op)(request, sid)  # call operation method
             else:
-                error = "Dieser Cookie schmeckt komisch..."
                 return self.render_template('login.html', error=error)
-        cookie_user_name = request.cookies.get("username")
-        if cookie_user_name not in [None, "None"] and self.check_cookie_data(request):
-            games_list = self.get_list_of_games()
-            response = self.render_template(
-                "join_game.html",
-                error=None,
-                success="Angemeldet",
-                game_list=games_list,
-                username=cookie_user_name
-            )
-            response.set_cookie("session_id", request.session.sid)
-            return response
+        # if username is not None:#and self.check_cookie_data(request):
+        #     games_list = self.get_list_of_games()
+        #     response = self.render_template(
+        #         "join_game.html",
+        #         error=None,
+        #         success="Angemeldet",
+        #         game_list=games_list,
+        #         username=cookie_user_name
+        #     )
+        #     return response
         response = self.render_template('login.html', error=error)
-        response.set_cookie("session_id", request.session.sid)
-        response.set_cookie("username", "None")
         return response
 
     def login(self, request, sid):
@@ -103,9 +89,7 @@ class Werbinich(object):
         if pw_hash and sha256.verify(pw, pw_hash):
             if self.redis.hexists(username, "change_pw"):
                 response = self.render_template("change_pw.html")
-                response.set_cookie("username", username)
-                response.set_cookie("session_id", request.session.sid)
-                self.redis.hset(username, "session_id", request.session.sid)
+                self.set_user_session(username, request.session.sid)
                 self.redis.hdel(username, "change_pw")
                 return response
             games_list = self.get_list_of_games()
@@ -123,9 +107,6 @@ class Werbinich(object):
                         username=username,
                         game_id=saved_game_id
                     )
-                    response.set_cookie("username", username)
-                    response.set_cookie("game_id", saved_game_id)
-                    response.set_cookie("session_id", request.session.sid)
                     self.redis.hset(username, "session_id", request.session.sid)
                     return response
             response = self.render_template(
@@ -136,9 +117,7 @@ class Werbinich(object):
             )
             if request.session.should_save:
                 session_store.save(request.session)
-            response.set_cookie("session_id", request.session.sid)
-            response.set_cookie("username", username)
-            self.redis.hset(username, "session_id", sid)
+            self.set_user_session(username, request.session.sid)
             return response
         elif pw_hash:
             error = "Falsches Passwort."
@@ -178,11 +157,9 @@ class Werbinich(object):
                 success=success,
                 username=username
             )
-            response.set_cookie("username", username)
+            self.set_user_session(username, request.session.sid)
             if request.session.should_save:
                 session_store.save(request.session)
-            response.set_cookie("session_id", request.session.sid)
-            self.redis.hset(username, "session_id", sid)
         else:
             error = "Die Passwörter stimmen nicht überein."
             response = self.render_template('registration_form.html', error=error)
@@ -195,7 +172,7 @@ class Werbinich(object):
         if not all(item in args for item in required):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
-        cookie_user_name = request.cookies.get("username")
+        session_user_name = self.get_user(request.session.sid)
         game_id = request.form["game_id"].strip()
         game_pw = request.form["game_pw"].strip()
         if not validate_username(game_id):
@@ -210,41 +187,39 @@ class Werbinich(object):
         if game_id in games_list:# if game exists
             pw_hash = self.get_game_pw(game_id)
             if sha256.verify(game_pw, pw_hash):#... and pw is correct
-                self.redis.hset(cookie_user_name, "game_id", game_id)
-                player_list = self.get_other_players(cookie_user_name)
+                self.redis.hset(session_user_name, "game_id", game_id)
+                player_list = self.get_other_players(session_user_name)
                 success = "Spiel beigetreten."
                 response = self.render_template(
                     'game.html',
                     error=None,
                     success=success,
                     player_list=player_list,
-                    username=cookie_user_name,
+                    username=session_user_name,
                     game_id=game_id
                 )
-                response.set_cookie("game_id", game_id)
             else:# game exists, pw incorrect
                 response = self.render_template(
                     'join_game.html',
                     error="Falsches Passwort",
                     game_list=games_list,
-                    username=cookie_user_name
+                    username=session_user_name
                 )
         else:
             # create game
-            self.redis.hset(cookie_user_name, "game_host", "true")
+            self.redis.hset(session_user_name, "game_host", "true")
             pw_hash = sha256.hash(game_pw)
-            self.redis.hset(cookie_user_name, "game_pw", pw_hash)
-            self.redis.hset(cookie_user_name, "game_id", game_id)
-            player_list = self.get_other_players(cookie_user_name)
+            self.redis.hset(session_user_name, "game_pw", pw_hash)
+            self.redis.hset(session_user_name, "game_id", game_id)
+            player_list = self.get_other_players(session_user_name)
             response = self.render_template(
                     'game.html',
                     error=None,
                     success="Spiel erstellt!",
                     player_list=player_list,
-                    username=cookie_user_name,
+                    username=session_user_name,
                     game_id=game_id
                 )
-            response.set_cookie("game_id", game_id)
         return response
 
     def set_player_character(self, request, sid):
@@ -256,7 +231,7 @@ class Werbinich(object):
         if not all(item in args for item in required):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
-        cookie_user_name = request.cookies.get("username")
+        session_user_name = self.get_user(request.session.sid)
         player_id = request.form["player"]
         player_character = request.form["character"].strip()
         old_character = self.redis.hget(player_id, "character")
@@ -267,41 +242,41 @@ class Werbinich(object):
         else:
             error = "Da steht schon ein Charakter."
         game_id = self.redis.hget(player_id, "game_id")
-        player_list = self.get_other_players(cookie_user_name)
+        player_list = self.get_other_players(session_user_name)
         response = self.render_template(
             'game.html',
             error=error,
             success=success,
             player_list=player_list,
-            username=cookie_user_name,
+            username=session_user_name,
             game_id=game_id
         )
         return response
 
     def reload_game(self, request, sid):
         """ reload other players in game """
-        cookie_user_name = request.cookies.get("username")
-        player_list = self.get_other_players(cookie_user_name)
-        game_id = self.redis.hget(cookie_user_name, "game_id")
+        session_user_name = self.get_user(request.session.sid)
+        player_list = self.get_other_players(session_user_name)
+        game_id = self.redis.hget(session_user_name, "game_id")
         response = self.render_template(
             'game.html',
             error=None,
             success=None,
             player_list=player_list,
-            username=cookie_user_name,
+            username=session_user_name,
             game_id=game_id
         )
         return response
 
     def leave_game(self, request, sid):
         """ leave game and transfer host if necessary """
-        cookie_user_name = request.cookies.get("username")
-        if self.redis.hexists(cookie_user_name, "game_host"):
-            game_id = request.cookies.get("game_id")
-            other_players = self.get_other_players(cookie_user_name)
-            game_pw = self.redis.hget(cookie_user_name, "game_pw")
-            self.redis.hdel(cookie_user_name, "game_pw", "game_host")
-            self.redis.hset(cookie_user_name, "character", "None")
+        session_user_name = self.get_user(request.session.sid)
+        if self.redis.hexists(session_user_name, "game_host"):
+            game_id = self.redis.hget(session_user_name, "game_id")
+            other_players = self.get_other_players(session_user_name)
+            game_pw = self.redis.hget(session_user_name, "game_pw")
+            self.redis.hdel(session_user_name, "game_pw", "game_host")
+            self.redis.hset(session_user_name, "character", "None")
             if other_players:
                 new_host = next(iter(other_players.keys()))
                 self.redis.hset(new_host, "game_host", "true")
@@ -310,22 +285,21 @@ class Werbinich(object):
         response = self.render_template(
             'index.html',
             error=None,
-            username=cookie_user_name
+            username=session_user_name
         )
-        response.set_cookie("game_id", "None")
-        self.redis.hset(cookie_user_name, "game_id", "None")
-        self.redis.hset(cookie_user_name, "character", "None")
-        self.redis.hset(cookie_user_name, "solved", "false")
+        self.redis.hset(session_user_name, "game_id", "None")
+        self.redis.hset(session_user_name, "character", "None")
+        self.redis.hset(session_user_name, "solved", "false")
         return response
 
     def logout(self, request, sid):
         response = self.render_template("login.html", success="Abgemeldet.")
-        response.set_cookie("username", "None")
-        response.set_cookie("game_id", "None")
+        session_user_name = self.get_user(request.session.sid)
+        self.redis.hset(session_user_name, "session_id", "None")
         return response
 
     def start(self, request, sid):
-        username = request.cookies.get("username")
+        username = self.get_user(request.session.sid)
         return self.render_template("index.html", username=username)
 
     def index(self, request, sid):
@@ -338,7 +312,7 @@ class Werbinich(object):
         return self.render_template("impressum.html", auth=True)
 
     def show_games(self, request, sid):
-        username = request.cookies.get("username")
+        username = self.get_user(request.session.sid)
         games_list = self.get_list_of_games()
         response = self.render_template(
             'join_game.html',
@@ -349,7 +323,7 @@ class Werbinich(object):
         return response
 
     def enter_new_pw(self, request, sid):
-        username = request.cookies.get("username")
+        username = self.get_user(request.session.sid)
         return self.render_template("change_pw.html", username=username, back_link="true")
 
     def set_new_pw(self, request, sid):
@@ -358,7 +332,7 @@ class Werbinich(object):
         if not all(item in args for item in required):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
-        username = request.cookies.get("username")
+        username = self.get_user(request.session.sid)
         old_pw = request.form["old_pw"].strip()
         new_pw = request.form["new_pw"].strip()
         new_pw_confirm = request.form["new_pw_confirm"].strip()
@@ -377,11 +351,11 @@ class Werbinich(object):
             return self.render_template("change_pw.html", error=error, back_link="true")
 
     def delete_user_data(self, request, sid):
-        username = request.cookies.get("username")
+        username = self.get_user(request.session.sid)
         return self.render_template("confirm_delete.html", username=username)
 
     def confirm_delete(self, request, sid):
-        username = request.cookies.get("username")
+        username = self.get_user(request.session.sid)
         self.redis.delete(username)
         success = "Daten gelöscht."
         return self.render_template("login.html", success=success)
@@ -396,7 +370,7 @@ class Werbinich(object):
         if not all(item in args for item in required):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
-        username = request.cookies.get("username")
+        username = self.get_user(request.session.sid)
         pw = request.form["pw"].strip()
         new_name = request.form["new_name"].strip()
         pw_hash = self.get_user_pw(username)
@@ -411,18 +385,18 @@ class Werbinich(object):
 
     def toggle_solved(self, request, sid):
         error = None
-        cookie_user_name = request.cookies.get("username")
+        session_user_name = self.get_user(request.session.sid)
         user_id = request.form["user_id"]
         if not user_id:
             error = "Das funktioniert nicht."
-            player_list = self.get_other_players(cookie_user_name)
-            game_id = self.redis.hget(cookie_user_name, "game_id")
+            player_list = self.get_other_players(session_user_name)
+            game_id = self.redis.hget(session_user_name, "game_id")
             response = self.render_template(
                 'game.html',
                 error=error,
                 success=None,
                 player_list=player_list,
-                username=cookie_user_name,
+                username=session_user_name,
                 game_id=game_id
             )
             return response
@@ -505,6 +479,17 @@ class Werbinich(object):
             if self.redis.hexists(key, "game_host") and self.redis.hget(key, "game_id") == game_id:
                 res = str(self.redis.hget(key, "game_pw"))
         return res
+
+    def get_user(self, session_id):
+        keys = self.redis.scan(0)[1]
+        for key in keys:
+            if self.redis.hexists(key, "session_id"):
+                return key
+        return "None"
+
+    def set_user_session(self, user, session_id):
+        self.redis.hset(user, "session_id", session_id)
+
 
 def create_app(with_static=True):
     app = Werbinich()
