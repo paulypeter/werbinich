@@ -475,7 +475,7 @@ class Werbinich(object):
         for key in keys:
             if self.redis.hexists(key, "session_id"):
                 key_session_id = self.redis.hget(key, "session_id")
-                if key_session_id = session_id:
+                if key_session_id == session_id:
                     return key
         return "None"
 
