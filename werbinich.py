@@ -53,13 +53,15 @@ class Werbinich(object):
     def on_load(self, request):
         """ Handle all form submit events """
         error=None
-        if not "session" in dir(request):
+        sid = request.cookies.get('session_id')
+        if sid is None:
             request.session = session_store.new()
-        sid = request.session.sid
+        else:
+            request.session = session_store.get(sid)
         username = self.get_user(sid)
         if request.method == 'POST':
             op = request.form["operation"]
-            if username != "None" or op == "login":
+            if username != "None" or op in ["login", "register"]:
                 return getattr(self, op)(request, sid)  # call operation method
             else:
                 return self.render_template('login.html', error=error)
@@ -77,9 +79,10 @@ class Werbinich(object):
         pw = request.form["login_pw"].strip()
         pw_hash = self.get_user_pw(username)
         if pw_hash and sha256.verify(pw, pw_hash):
+            self.set_user_session(username, request.session.sid)
             if self.redis.hexists(username, "change_pw"):
                 response = self.render_template("change_pw.html")
-                self.set_user_session(username, request.session.sid)
+                response.set_cookie("session_id", request.session.sid)
                 self.redis.hdel(username, "change_pw")
                 return response
             games_list = self.get_list_of_games()
@@ -97,7 +100,8 @@ class Werbinich(object):
                         username=username,
                         game_id=saved_game_id
                     )
-                    self.redis.hset(username, "session_id", request.session.sid)
+                    self.set_user_session(username, request.session.sid)
+                    response.set_cookie("session_id", request.session.sid)
                     return response
             response = self.render_template(
                 'index.html',
@@ -108,6 +112,7 @@ class Werbinich(object):
             if request.session.should_save:
                 session_store.save(request.session)
             self.set_user_session(username, request.session.sid)
+            response.set_cookie("session_id", request.session.sid)
             return response
         elif pw_hash:
             error = "Falsches Passwort."
@@ -150,6 +155,7 @@ class Werbinich(object):
             self.set_user_session(username, request.session.sid)
             if request.session.should_save:
                 session_store.save(request.session)
+            response.set_cookie("session_id", request.session.sid)
         else:
             error = "Die Passwörter stimmen nicht überein."
             response = self.render_template('registration_form.html', error=error)
@@ -474,8 +480,19 @@ class Werbinich(object):
         keys = self.redis.scan(0)[1]
         for key in keys:
             if self.redis.hexists(key, "session_id"):
-                return key
+                key_session_id = self.redis.hget(key, "session_id")
+                if key_session_id == session_id:
+                    return key
         return "None"
+
+    def session_exists(self, session_id):
+        keys = self.redis.scan(0)[1]
+        for key in keys:
+            if self.redis.hexists(key, "session_id"):
+                key_session_id = self.redis.hget(key, "session_id")
+                if key_session_id == session_id:
+                    return key
+        return False
 
     def set_user_session(self, user, session_id):
         self.redis.hset(user, "session_id", session_id)
