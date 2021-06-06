@@ -1,4 +1,4 @@
-![GitHub](https://img.shields.io/github/license/paulypeter/werbinich) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/paulypeter/werbinich) ![GitHub issues](https://img.shields.io/github/issues-raw/paulypeter/werbinich) ![GitHub last commit](https://img.shields.io/github/last-commit/paulypeter/werbinich) [![https://werbinich.xyz](https://img.shields.io/badge/online-werbinich.xyz-blue)](https://werbinich.xyz)
+[![GitHub](https://img.shields.io/github/license/paulypeter/werbinich)](https://github.com/paulypeter/werbinich/blob/main/LICENSE) [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/paulypeter/werbinich)](https://github.com/paulypeter/werbinich/releases) [![GitHub issues](https://img.shields.io/github/issues-raw/paulypeter/werbinich)](https://github.com/paulypeter/werbinich/issues) ![GitHub last commit](https://img.shields.io/github/last-commit/paulypeter/werbinich) [![https://werbinich.xyz](https://img.shields.io/badge/online-werbinich.xyz-blue)](https://werbinich.xyz)
 
 # werbinich
 
