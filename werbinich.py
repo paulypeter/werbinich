@@ -135,7 +135,7 @@ class Werbinich(object):
             error = "Das funktioniert nicht."
             return self.render_template('login.html', error=error)
         username = request.form["username"].strip()
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         if username in keys:
             error = "Diese:r Nutzer:in existiert bereits."
             return self.render_template('registration_form.html', error=error)
