@@ -61,7 +61,7 @@ class Werbinich(object):
         username = self.get_user(sid)
         if request.method == 'POST':
             op = request.form["operation"]
-            if username != "None" or op in ["login", "register"]:
+            if username != "None" or op in ["login", "register", "registration_form"]:
                 return getattr(self, op)(request, sid)  # call operation method
             else:
                 return self.render_template('login.html', error=error)
