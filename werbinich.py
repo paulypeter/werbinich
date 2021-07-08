@@ -497,6 +497,16 @@ class Werbinich(object):
     def set_user_session(self, user, session_id):
         self.redis.hset(user, "session_id", session_id)
 
+    def get_all_keys():
+        i = 0
+        res = r.scan(i)
+        keys = res[1]
+        while res[0] != 0:
+            res = r.scan(i)
+            keys += res[1]
+            i += 1
+        return set(keys)
+
 
 def create_app(with_static=True):
     app = Werbinich()
