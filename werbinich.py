@@ -404,7 +404,7 @@ class Werbinich(object):
 
     def get_list_of_games(self):
         """ get a `set` of game IDs """
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         games_list = []
         if keys:
             for key in keys:
@@ -429,7 +429,7 @@ class Werbinich(object):
 
     def get_user_pw(self, username):
         """ get hash of user pw """
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         if username in keys:
             res = self.redis.hget(username, "pw_hash")
         else:
@@ -438,7 +438,7 @@ class Werbinich(object):
 
     def check_cookie_data(self, request):
         """ check whether cookie was tampered with """
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         cookie_user_name = request.cookies.get("username")
         if cookie_user_name in keys:
             cookie_sid = request.cookies.get("session_id")
@@ -454,7 +454,7 @@ class Werbinich(object):
 
     def get_other_players(self, user_id):
         """ get other players in the same game """
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         player_list = {}
         user_game_id = self.redis.hget(user_id, "game_id")
         for key in keys:
@@ -469,7 +469,7 @@ class Werbinich(object):
 
     def get_game_pw(self, game_id):
         """ get game pw from host """
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         res = "None"
         for key in keys:
             if self.redis.hexists(key, "game_host") and self.redis.hget(key, "game_id") == game_id:
@@ -477,7 +477,7 @@ class Werbinich(object):
         return res
 
     def get_user(self, session_id):
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         for key in keys:
             if self.redis.hexists(key, "session_id"):
                 key_session_id = self.redis.hget(key, "session_id")
@@ -486,7 +486,7 @@ class Werbinich(object):
         return "None"
 
     def session_exists(self, session_id):
-        keys = self.redis.scan(0)[1]
+        keys = self.get_all_keys()
         for key in keys:
             if self.redis.hexists(key, "session_id"):
                 key_session_id = self.redis.hget(key, "session_id")
